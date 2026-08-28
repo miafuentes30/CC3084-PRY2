@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Proyecto 2 -------------------------------------------------------------
+# Los CSV de Tianchi pesan varios GB y no se versionan.
+data/raw/*
+!data/raw/.gitkeep
