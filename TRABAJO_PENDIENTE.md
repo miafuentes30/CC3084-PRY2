@@ -5,11 +5,11 @@
 > - Una vez que termines tu parte **eliminá el bloque completo** de esa parte de este archivo.
 > - Así los demás sabrán qué queda libre y no habrá confusión.
 >
-> ⚠️ Las partes son **secuenciales**: la Parte 3 y la Parte 4 requieren haber corrido la Parte 2 primero (genera `data/processed/train_clean.csv`).
+> ADVERTENCIA: Las partes son **secuenciales**: la Parte 3 y la Parte 4 requieren haber corrido la Parte 2 primero (genera `data/processed/train_clean.csv`).
 
 ---
 
-## ✅ Parte 1 – Introducción y Carga *(COMPLETADA)*
+## [COMPLETADA] Parte 1 – Introducción y Carga *(COMPLETADA)*
 
 Notebook: `notebooks/01_introduccion_y_carga.ipynb`
 
@@ -21,7 +21,7 @@ Esta parte ya fue realizada. Incluye:
 
 ---
 
-## 🔲 Parte 2 – Descripción y Limpieza de Datos
+##  Parte 2 – Descripción y Limpieza de Datos
 
 **Notebook a crear:** `notebooks/02_descripcion_y_limpieza.ipynb`
 
@@ -64,7 +64,7 @@ Esta parte ya fue realizada. Incluye:
 
 ---
 
-## 🔲 Parte 3 – EDA: Variables Numéricas y Distribuciones
+##  Parte 3 – EDA: Variables Numéricas y Distribuciones
 
 **Notebook a crear:** `notebooks/03_eda_numericas_texto.ipynb`
 
@@ -103,7 +103,7 @@ Esta parte ya fue realizada. Incluye:
 
 ---
 
-## 🔲 Parte 4 – EDA: Variables Categóricas + Hallazgos y Conclusiones
+##  Parte 4 – EDA: Variables Categóricas + Hallazgos y Conclusiones
 
 **Notebook a crear:** `notebooks/04_eda_categoricas_conclusiones.ipynb`
 
