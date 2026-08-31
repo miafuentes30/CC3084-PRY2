@@ -1,31 +1,37 @@
-"""Rutas y codificaciones del dataset IJCAI-15 Repeat Buyers (Tianchi 231576)."""
+"""Rutas y constantes del dataset LMSYS Chatbot Arena.
+
+Competencia Kaggle: lmsys-chatbot-arena
+Reto 11 – Negocios | CC3084 Data Science – Semestre II 2026
+"""
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-RAW = ROOT / "data" / "raw"
+# ── Raíces del proyecto ─────────────────────────────────────────────────────
+ROOT      = Path(__file__).resolve().parents[1]
+RAW       = ROOT / "data" / "raw"
+PROCESSED = ROOT / "data" / "processed"
 
-F_USER_INFO = RAW / "user_info_format1.csv"
-F_USER_LOG = RAW / "user_log_format1.csv"
-F_TRAIN = RAW / "train_format1.csv"
-F_TEST = RAW / "test_format1.csv"
+# ── Archivos del dataset ────────────────────────────────────────────────────
+F_TRAIN        = RAW / "train.csv"
+F_TEST         = RAW / "test.csv"
+F_SUBMISSION   = RAW / "sample_submission.csv"
+F_TRAIN_CLEAN  = PROCESSED / "train_clean.csv"
 
-ACTION_TYPE = {0: "clic", 1: "carrito", 2: "compra", 3: "favorito"}
+# ── Nombres de columnas ─────────────────────────────────────────────────────
+COL_ID       = "id"
+COL_MODEL_A  = "model_a"
+COL_MODEL_B  = "model_b"
+COL_PROMPT   = "prompt"
+COL_RESP_A   = "response_a"
+COL_RESP_B   = "response_b"
+COL_WIN_A    = "winner_model_a"
+COL_WIN_B    = "winner_model_b"
+COL_WIN_TIE  = "winner_tie"
 
-AGE_RANGE = {
-    0: "desconocido", 1: "<18", 2: "18-24", 3: "25-29",
-    4: "30-34", 5: "35-39", 6: "40-49", 7: ">=50", 8: ">=50",
-}
+# ── Agrupaciones de columnas ────────────────────────────────────────────────
+TEXT_COLS   = [COL_PROMPT, COL_RESP_A, COL_RESP_B]
+WINNER_COLS = [COL_WIN_A, COL_WIN_B, COL_WIN_TIE]
 
-GENDER = {0: "femenino", 1: "masculino", 2: "desconocido"}
-
-DTYPES_LOG = {
-    "user_id": "int32",
-    "item_id": "int32",
-    "cat_id": "int16",
-    "seller_id": "int32",
-    "brand_id": "float32",  # tiene nulos -> no puede ser int
-    "time_stamp": "int16",
-    "action_type": "int8",
-}
-DTYPES_USER_INFO = {"user_id": "int32", "age_range": "float32", "gender": "float32"}
-DTYPES_TRAIN = {"user_id": "int32", "merchant_id": "int32", "label": "int8"}
+# ── Etiqueta unificada derivada de las tres columnas de ganador ─────────────
+# 0 → model_a gana  |  1 → model_b gana  |  2 → empate
+LABEL_MAP   = {COL_WIN_A: 0, COL_WIN_B: 1, COL_WIN_TIE: 2}
+LABEL_NAMES = {0: "model_a gana", 1: "model_b gana", 2: "empate"}

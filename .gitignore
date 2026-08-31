@@ -217,7 +217,10 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# --- Proyecto 2 -------------------------------------------------------------
-# Los CSV de Tianchi pesan varios GB y no se versionan.
+# --- Proyecto 2 – LMSYS Chatbot Arena ---------------------------------------
+# Los CSV de Kaggle pesan varios GB y no se versionan.
 data/raw/*
 !data/raw/.gitkeep
+# Los archivos procesados tampoco se versionan (se generan corriendo notebooks).
+data/processed/*
+!data/processed/.gitkeep
