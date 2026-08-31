@@ -21,46 +21,22 @@ Esta parte ya fue realizada. Incluye:
 
 ---
 
-##  Parte 2 – Descripción y Limpieza de Datos
+## [COMPLETADA] Parte 2 – Descripción y Limpieza de Datos *(COMPLETADA — pendiente de ejecución)*
 
-**Notebook a crear:** `notebooks/02_descripcion_y_limpieza.ipynb`
+Notebook: `notebooks/02_descripcion_y_limpieza.ipynb`
 
-**Prerequisito:** Tener el dataset en `data/raw/` (ver README para descarga).
+El código de esta parte ya está escrito y cubre las 7 tareas del enunciado original (descripción de
+variables, análisis de nulos, duplicados por `id`, limpieza de texto JSON, columna `winner` derivada,
+features de longitud y guardado de `data/processed/train_clean.csv`), y su lógica fue validada con datos
+sintéticos.
 
-**Tareas a realizar:**
-
-1. **Descripción de variables**
-   - Tabla con nombre, tipo, descripción y rango/cardinalidad de cada columna
-   - Describir qué significa cada columna en el contexto del problema
-
-2. **Análisis de valores nulos**
-   - `df.isnull().sum()` por columna
-   - Porcentaje de nulos
-   - Visualización: heatmap de nulos o gráfico de barras
-   - Decisión documentada: ¿se imputan o se eliminan?
-
-3. **Detección y manejo de duplicados**
-   - Revisar duplicados por `id`
-   - Documentar cuántos hay y qué se hace con ellos
-
-4. **Limpieza de columnas de texto**
-   - `prompt`, `response_a`, `response_b` vienen como JSON strings (listas de turnos)
-   - Extraer el texto plano de cada columna
-   - Manejar los `None` dentro de las listas
-
-5. **Derivar columna `winner`**
-   - Crear columna `winner` unificada: 0 = model_a, 1 = model_b, 2 = tie
-   - Usar `config.LABEL_MAP` de `src/config.py`
-
-6. **Calcular features de longitud**
-   - `prompt_len`, `resp_a_len`, `resp_b_len` (en caracteres)
-   - `prompt_words`, `resp_a_words`, `resp_b_words` (en palabras)
-   - `n_turns` (número de turnos de conversación)
-
-7. **Guardar dataset limpio**
-   - `df_clean.to_csv('data/processed/train_clean.csv', index=False)`
-
-**Una vez terminado, eliminá este bloque del archivo.**
+**IMPORTANTE — falta un paso manual:** el notebook no se ejecutó contra el dataset real porque este
+entorno no tenía credenciales de Kaggle ni `data/raw/train.csv` disponibles. La primera persona del
+equipo que lo abra con el dataset ya descargado debe:
+1. Ejecutar todas las celdas de principio a fin (`Run All`).
+2. Revisar que `data/processed/train_clean.csv` se generó correctamente.
+3. Confirmar que la cifra de duplicados/nulos en las celdas coincide con lo esperado y hacer commit del
+   notebook con sus outputs.
 
 ---
 
