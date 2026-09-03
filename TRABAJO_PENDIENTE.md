@@ -1,121 +1,108 @@
-# Trabajo Pendiente – CC3084 Proyecto 2
+# Trabajo Pendiente. CC3084 Proyecto 2
 
 > **Cómo usar este archivo:**
-> - Elegí una parte que esté disponible (sin tachar).
-> - Una vez que termines tu parte **eliminá el bloque completo** de esa parte de este archivo.
-> - Así los demás sabrán qué queda libre y no habrá confusión.
+> - Elegí una parte que esté disponible (sin marcar como completada).
+> - Una vez que termines tu parte, reemplazá su bloque por un resumen corto de lo que quedó cubierto,
+>   para que quien siga no repita trabajo.
 >
-> ADVERTENCIA: Las partes son **secuenciales**: la Parte 3 y la Parte 4 requieren haber corrido la Parte 2 primero (genera `data/processed/train_clean.csv`).
+> ADVERTENCIA: las partes son **secuenciales**. La Parte 3 y la Parte 4 requieren haber corrido la
+> Parte 2 primero, que es la que genera `data/processed/train_clean.csv`.
 
 ---
 
-## [COMPLETADA] Parte 1 – Introducción y Carga *(COMPLETADA)*
+## [COMPLETADA] Parte 1. Introducción y Carga
 
-Notebook: `notebooks/01_introduccion_y_carga.ipynb`
+Notebook: `notebooks/01_introduccion_y_carga.ipynb` (ejecutado, con outputs guardados)
 
-Esta parte ya fue realizada. Incluye:
-- Situación problemática, problema científico y objetivos
-- Configuración del ambiente y módulos `src/`
-- Descarga del dataset con `kagglehub`
-- Primera exploración: shape, dtypes, `.head()`, `.info()`
+Cubre: situación problemática, problema científico, objetivos, configuración del ambiente y módulos
+`src/`, descarga con `kagglehub` y primera exploración del archivo crudo (shape, dtypes, nulos a nivel
+de celda, distribución del resultado y listado de los 64 modelos).
+
+Cifras establecidas ahí y que el resto del informe da por conocidas: **57,477 batallas x 9 columnas**,
+**64 modelos distintos**, **cero nulos a nivel de celda** y un reparto del resultado de
+34.91% / 34.19% / 30.90% entre victoria de A, victoria de B y empate.
 
 ---
 
-## [COMPLETADA] Parte 2 – Descripción y Limpieza de Datos *(COMPLETADA — pendiente de ejecución)*
+## [COMPLETADA] Parte 2. Descripción y Limpieza de Datos
 
 Notebook: `notebooks/02_descripcion_y_limpieza.ipynb`
 
-El código de esta parte ya está escrito y cubre las 7 tareas del enunciado original (descripción de
-variables, análisis de nulos, duplicados por `id`, limpieza de texto JSON, columna `winner` derivada,
-features de longitud y guardado de `data/processed/train_clean.csv`), y su lógica fue validada con datos
-sintéticos.
+Cubre: descripción de las nueve variables, duplicados por `id` y por contenido, parseo de las columnas
+JSON con conteo de fallos, análisis de nulos a nivel de celda y de turnos sin respuesta, variable
+objetivo unificada `winner`, variables de longitud y guardado de `data/processed/train_clean.csv`.
 
-**IMPORTANTE — falta un paso manual:** el notebook no se ejecutó contra el dataset real porque este
-entorno no tenía credenciales de Kaggle ni `data/raw/train.csv` disponibles. La primera persona del
-equipo que lo abra con el dataset ya descargado debe:
-1. Ejecutar todas las celdas de principio a fin (`Run All`).
-2. Revisar que `data/processed/train_clean.csv` se generó correctamente.
-3. Confirmar que la cifra de duplicados/nulos en las celdas coincide con lo esperado y hacer commit del
-   notebook con sus outputs.
+**PENDIENTE: ejecutarlo contra el dataset real.** El notebook nunca se corrió con los datos de Kaggle,
+solo se validó su lógica. Quien tenga `data/raw/train.csv` descargado debe hacer `Run All`, revisar que
+las cifras de duplicados, fallos de parseo y turnos sin respuesta sean razonables, y comitear el
+notebook con sus outputs. Sin ese paso no existe `train_clean.csv` y las Partes 3 y 4 no corren.
 
 ---
 
-##  Parte 3 – EDA: Variables Numéricas y Distribuciones
+## [COMPLETADA] Parte 3. Análisis Exploratorio: Variables Cuantitativas
 
-**Notebook a crear:** `notebooks/03_eda_numericas_texto.ipynb`
+Notebook: `notebooks/03_eda_numericas_texto.ipynb`
 
-**Prerequisito:** Haber completado la Parte 2 (necesitás `data/processed/train_clean.csv`).
+Cubre: estadística descriptiva con percentiles extremos y medidas de forma, verificación de la
+variable objetivo sobre el dataset limpio, histogramas de longitudes en escala lineal y logarítmica,
+distribución del número de turnos con su tasa de empate, diagramas de caja de longitud contra
+resultado, cuantificación del sesgo por verbosidad, tratamiento documentado de valores atípicos y
+participación de cada modelo con su reparto entre las posiciones A y B.
 
-**Tareas a realizar:**
+Figuras generadas: `fig_hist_longitudes.png`, `fig_turnos.png`,
+`fig_boxplot_longitud_resultado.png`, `fig_participacion_modelos.png`.
 
-1. **Estadística descriptiva**
-   - `.describe()` sobre las columnas numéricas derivadas (longitudes, número de turnos)
-   - Tabla de estadísticos: media, mediana, std, mín, máx, cuartiles
-
-2. **Distribución de la variable objetivo**
-   - Gráfico de barras / pie chart: ¿cuántas victorias tiene model_a vs model_b vs empate?
-   - Tabla de frecuencias y proporciones
-
-3. **Histogramas de longitudes**
-   - Histograma de `prompt_len`, `resp_a_len`, `resp_b_len`
-   - Escala logarítmica si hay skew muy fuerte
-   - Descripción de lo que se observa
-
-4. **Boxplots por resultado**
-   - Boxplot de `resp_a_len` y `resp_b_len` agrupados por `winner`
-   - ¿Las respuestas más largas tienden a ganar?
-   - Identificar outliers
-
-5. **Análisis de outliers**
-   - Identificar filas con longitudes extremas (percentil 99+)
-   - ¿Son errores o casos válidos?
-   - Decisión documentada
-
-6. **Distribución de modelos participantes**
-   - ¿Cuántas veces aparece cada modelo (como model_a o model_b)?
-   - Gráfico de barras horizontal ordenado
-
-**Una vez terminado, eliminá este bloque del archivo.**
+**Igual que la Parte 2, falta ejecutarlo contra el dataset real.**
 
 ---
 
-##  Parte 4 – EDA: Variables Categóricas + Hallazgos y Conclusiones
+## Parte 4. EDA de Variables Categóricas, Hallazgos y Conclusiones
 
 **Notebook a crear:** `notebooks/04_eda_categoricas_conclusiones.ipynb`
 
-**Prerequisito:** Haber completado la Parte 2 (necesitás `data/processed/train_clean.csv`).
+**Prerequisito:** haber corrido la Parte 2 para tener `data/processed/train_clean.csv`.
 
-**Tareas a realizar:**
+### Qué NO repetir
 
-1. **Tablas de frecuencia de modelos**
-   - Frecuencia y proporción de aparición de cada modelo
-   - Tabla ordenada de mayor a menor
+Para que el informe final no quede con secciones duplicadas, tres puntos del plan original ya están
+resueltos en la Parte 3 y conviene retomarlos en lugar de rehacerlos:
 
-2. **Win rate por modelo**
-   - Para cada modelo: `victorias / (veces que aparece)`
-   - Gráfico de barras con el win rate de cada modelo
-   - Separar entre cuando el modelo aparece como A vs como B (sesgo de posición)
+- **Tabla de frecuencia y proporción de aparición de cada modelo:** hecha en la sección 8, junto con
+  el gráfico de barras horizontal y la concentración del top 10. Partí de ahí directo al win rate.
+- **Reparto de cada modelo entre las posiciones A y B:** ya medido en la misma sección. Sirve como
+  control de que la asignación es aleatoria; el análisis de sesgo de posición sobre las *victorias*
+  sigue pendiente y es tuyo.
+- **Relación entre longitud y victoria:** la sección 6 ya cuantifica con qué frecuencia gana la
+  respuesta más larga. En el heatmap de correlaciones no vuelvas a plantear la pregunta, citá el
+  resultado y enfocá el heatmap en el conjunto de variables.
 
-3. **Análisis de empates**
-   - ¿Qué modelos tienen mayor tasa de empate?
-   - Gráfico comparativo
+### Tareas
 
-4. **Correlaciones**
-   - Heatmap de correlación entre variables numéricas (longitudes, winner)
-   - ¿Longitud de respuesta correlaciona con ganar?
-   - Scatter plots: `resp_a_len` vs `resp_b_len`, coloreado por `winner`
+1. **Win rate por modelo**
+   - Para cada modelo: `victorias / apariciones`, reportando siempre el número de batallas que
+     respalda cada porcentaje (la participación es muy desigual, hay modelos con muy pocos casos).
+   - Gráfico de barras con el win rate, filtrando o marcando los modelos con muestra insuficiente.
+   - Win rate por separado según aparezca como A o como B.
 
-5. **Análisis de sesgo de posición**
-   - ¿El modelo en posición A (model_a) tiene ventaja sobre el modelo en posición B?
-   - Proporción de victorias de model_a vs model_b en total
+2. **Análisis de empates por modelo**
+   - Qué modelos empatan más seguido y contra qué tipo de rival.
+   - Gráfico comparativo.
 
-6. **Hallazgos**
-   - Celda markdown con resumen de todos los hallazgos encontrados
-   - Mínimo 5 hallazgos concretos con su justificación
+3. **Correlaciones**
+   - Heatmap entre las variables numéricas y el resultado.
+   - Scatter de `resp_a_len` contra `resp_b_len` coloreado por `winner`.
 
-7. **Conclusiones**
-   - ¿Qué factores parecen influir en la preferencia humana?
-   - ¿Qué pasos siguientes se recomiendan para el modelado?
-   - Implicaciones para negocios (¿qué modelo usar en producción?)
+4. **Sesgo de posición**
+   - Proporción de victorias de model_a contra model_b en el total.
+   - Contrastarlo con el reparto A/B por modelo de la Parte 3 para separar el sesgo del evaluador
+     humano de un posible desbalance en la asignación.
 
-**Una vez terminado, eliminá este bloque del archivo.**
+5. **Hallazgos**
+   - Mínimo 5 hallazgos concretos con su justificación numérica.
+   - La Parte 3 cierra con sus propios hallazgos sobre las variables cuantitativas: complementalos,
+     no los repitas.
+
+6. **Conclusiones del informe**
+   - Qué factores parecen influir en la preferencia humana.
+   - Qué pasos se recomiendan para el modelado.
+   - Implicaciones de negocio: qué modelo conviene usar en producción y bajo qué criterio.

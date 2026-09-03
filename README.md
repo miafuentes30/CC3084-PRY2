@@ -56,30 +56,6 @@ Los archivos deben quedar en `data/raw/`:
 
 ---
 
-## Estructura del proyecto
-
-```
-CC3084-PRY2/
-├── data/
-│   ├── raw/              ← archivos de Kaggle (ignorados por git)
-│   └── processed/        ← datasets limpios generados por notebooks
-├── docs/
-│   └── Proyecto 2. Análisis Exploratorio. 2026.pdf
-├── notebooks/
-│   ├── 01_introduccion_y_carga.ipynb      ← Parte 1
-│   ├── 02_descripcion_y_limpieza.ipynb    ← Parte 2
-│   ├── 03_eda_numericas_texto.ipynb       ← Parte 3
-│   └── 04_eda_categoricas_conclusiones.ipynb ← Parte 4
-├── src/
-│   ├── __init__.py
-│   ├── config.py         ← rutas y constantes
-│   └── load.py           ← funciones de carga
-├── TRABAJO_PENDIENTE.md  ← instrucciones por parte
-└── requirements.txt
-```
-
----
-
 ## Uso de los módulos `src`
 
 ```python
@@ -94,9 +70,3 @@ train = load.load_train(nrows=5_000)
 # Dataset limpio (generado por notebook 02)
 clean = load.load_train_clean()
 ```
-
----
-
-## Organización del trabajo
-
-Ver [`TRABAJO_PENDIENTE.md`](TRABAJO_PENDIENTE.md) para ver qué partes están disponibles.
