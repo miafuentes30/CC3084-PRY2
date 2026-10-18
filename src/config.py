@@ -15,6 +15,7 @@ F_TRAIN        = RAW / "train.csv"
 F_TEST         = RAW / "test.csv"
 F_SUBMISSION   = RAW / "sample_submission.csv"
 F_TRAIN_CLEAN  = PROCESSED / "train_clean.csv"
+F_SPLITS       = ROOT / "data" / "splits.csv"      # versionado en Git, compartido por todos
 
 # ── Nombres de columnas ─────────────────────────────────────────────────────
 COL_ID       = "id"

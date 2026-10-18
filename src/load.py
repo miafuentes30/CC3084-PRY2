@@ -42,3 +42,16 @@ def load_train_clean(nrows: int | None = None) -> pd.DataFrame:
     Requiere haber ejecutado notebooks/02_descripcion_y_limpieza.ipynb primero.
     """
     return pd.read_csv(_check(cfg.F_TRAIN_CLEAN), nrows=nrows)
+
+
+def load_splits() -> pd.DataFrame:
+    """Carga data/splits.csv (columnas `id`, `split`), generado por el notebook 05."""
+    return pd.read_csv(_check(cfg.F_SPLITS))
+
+
+def load_split(split: str) -> pd.DataFrame:
+    """Dataset limpio filtrado a una partición: 'train', 'val' o 'test'."""
+    if split not in ("train", "val", "test"):
+        raise ValueError("split debe ser 'train', 'val' o 'test'")
+    df = load_train_clean().merge(load_splits(), on=cfg.COL_ID, validate="one_to_one")
+    return df[df["split"] == split].drop(columns="split").reset_index(drop=True)
