@@ -91,3 +91,25 @@ El análisis ejecutado se encuentra en
 `notebooks/06_modelo_regresion_logistica.ipynb` y la redacción para el informe en
 `docs/modelo_regresion_logistica.md`. Los CSV y métricas se guardan bajo `results/`.
 El pipeline `models/logreg_pipeline.joblib` se genera localmente y está excluido de Git.
+
+## XGBoost + estilo + Bradley–Terry–Davidson (Modelo 2)
+
+Compara tres variantes: (a) sin BTD, (b) con BTD y (c) BTD + reward model (opcional).
+Detalles en `docs/modelo_xgboost.md`.
+
+```bash
+python -m src.xgb_model --nrows 2000 --trials 3   # prueba rápida
+python -m src.xgb_model --trials 40               # corrida final
+```
+
+## Aplicación Streamlit
+
+```bash
+pip install -r requirements.txt
+python -m src.export_app_models      # prepara los modelos para clasificar casos nuevos (logreg y XGBoost)
+streamlit run app/streamlit_app.py
+```
+
+Pestañas: resumen, exploración de los datos, resultados de los 4 modelos (se pueden ocultar) y clasificación de un caso nuevo.
+Requiere `data/processed/train_clean.csv` (notebook 02) y `data/splits.csv`. La clasificación en vivo está disponible para
+regresión logística y XGBoost; embeddings y DeBERTa muestran sus resultados, pero sus artefactos viven en Drive.

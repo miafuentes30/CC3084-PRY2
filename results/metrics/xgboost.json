@@ -1,0 +1,649 @@
+{
+  "model_id": "xgboost",
+  "model_name": "XGBoost + estilo + Bradley–Terry–Davidson (b) Con BTD",
+  "responsible": "Angel Esteban Esquit Hernández (23221)",
+  "seed": 42,
+  "hardware": "cpu",
+  "final_variant": "b",
+  "reward_model_used": false,
+  "hyperparameters": {
+    "max_depth": 4,
+    "learning_rate": 0.05128813363045768,
+    "subsample": 0.7067398964621144,
+    "colsample_bytree": 0.3734130783727589,
+    "min_child_weight": 10,
+    "reg_lambda": 4.740078029489769,
+    "augment_swap": true,
+    "n_estimators": 719
+  },
+  "features": {
+    "n_features": 171,
+    "columns": [
+      "prompt_len",
+      "resp_a_len",
+      "resp_b_len",
+      "prompt_words",
+      "resp_a_words",
+      "resp_b_words",
+      "n_turns",
+      "dif_len",
+      "dif_words",
+      "log_prompt_len",
+      "log_resp_a_len",
+      "log_resp_b_len",
+      "dif_log_len",
+      "model_a_RWKV-4-Raven-14B",
+      "model_a_alpaca-13b",
+      "model_a_chatglm-6b",
+      "model_a_chatglm2-6b",
+      "model_a_chatglm3-6b",
+      "model_a_claude-1",
+      "model_a_claude-2.0",
+      "model_a_claude-2.1",
+      "model_a_claude-instant-1",
+      "model_a_codellama-34b-instruct",
+      "model_a_deepseek-llm-67b-chat",
+      "model_a_dolly-v2-12b",
+      "model_a_dolphin-2.2.1-mistral-7b",
+      "model_a_falcon-180b-chat",
+      "model_a_fastchat-t5-3b",
+      "model_a_gemini-pro",
+      "model_a_gemini-pro-dev-api",
+      "model_a_gpt-3.5-turbo-0125",
+      "model_a_gpt-3.5-turbo-0314",
+      "model_a_gpt-3.5-turbo-0613",
+      "model_a_gpt-3.5-turbo-1106",
+      "model_a_gpt-4-0125-preview",
+      "model_a_gpt-4-0314",
+      "model_a_gpt-4-0613",
+      "model_a_gpt-4-1106-preview",
+      "model_a_gpt4all-13b-snoozy",
+      "model_a_guanaco-33b",
+      "model_a_koala-13b",
+      "model_a_llama-13b",
+      "model_a_llama-2-13b-chat",
+      "model_a_llama-2-70b-chat",
+      "model_a_llama-2-7b-chat",
+      "model_a_llama2-70b-steerlm-chat",
+      "model_a_mistral-7b-instruct",
+      "model_a_mistral-7b-instruct-v0.2",
+      "model_a_mistral-medium",
+      "model_a_mixtral-8x7b-instruct-v0.1",
+      "model_a_mpt-30b-chat",
+      "model_a_mpt-7b-chat",
+      "model_a_nous-hermes-2-mixtral-8x7b-dpo",
+      "model_a_oasst-pythia-12b",
+      "model_a_openchat-3.5",
+      "model_a_openchat-3.5-0106",
+      "model_a_openhermes-2.5-mistral-7b",
+      "model_a_palm-2",
+      "model_a_pplx-70b-online",
+      "model_a_pplx-7b-online",
+      "model_a_qwen-14b-chat",
+      "model_a_qwen1.5-4b-chat",
+      "model_a_qwen1.5-72b-chat",
+      "model_a_qwen1.5-7b-chat",
+      "model_a_solar-10.7b-instruct-v1.0",
+      "model_a_stablelm-tuned-alpha-7b",
+      "model_a_starling-lm-7b-alpha",
+      "model_a_stripedhyena-nous-7b",
+      "model_a_tulu-2-dpo-70b",
+      "model_a_vicuna-13b",
+      "model_a_vicuna-33b",
+      "model_a_vicuna-7b",
+      "model_a_wizardlm-13b",
+      "model_a_wizardlm-70b",
+      "model_a_yi-34b-chat",
+      "model_a_zephyr-7b-alpha",
+      "model_a_zephyr-7b-beta",
+      "model_b_RWKV-4-Raven-14B",
+      "model_b_alpaca-13b",
+      "model_b_chatglm-6b",
+      "model_b_chatglm2-6b",
+      "model_b_chatglm3-6b",
+      "model_b_claude-1",
+      "model_b_claude-2.0",
+      "model_b_claude-2.1",
+      "model_b_claude-instant-1",
+      "model_b_codellama-34b-instruct",
+      "model_b_deepseek-llm-67b-chat",
+      "model_b_dolly-v2-12b",
+      "model_b_dolphin-2.2.1-mistral-7b",
+      "model_b_falcon-180b-chat",
+      "model_b_fastchat-t5-3b",
+      "model_b_gemini-pro",
+      "model_b_gemini-pro-dev-api",
+      "model_b_gpt-3.5-turbo-0125",
+      "model_b_gpt-3.5-turbo-0314",
+      "model_b_gpt-3.5-turbo-0613",
+      "model_b_gpt-3.5-turbo-1106",
+      "model_b_gpt-4-0125-preview",
+      "model_b_gpt-4-0314",
+      "model_b_gpt-4-0613",
+      "model_b_gpt-4-1106-preview",
+      "model_b_gpt4all-13b-snoozy",
+      "model_b_guanaco-33b",
+      "model_b_koala-13b",
+      "model_b_llama-13b",
+      "model_b_llama-2-13b-chat",
+      "model_b_llama-2-70b-chat",
+      "model_b_llama-2-7b-chat",
+      "model_b_llama2-70b-steerlm-chat",
+      "model_b_mistral-7b-instruct",
+      "model_b_mistral-7b-instruct-v0.2",
+      "model_b_mistral-medium",
+      "model_b_mixtral-8x7b-instruct-v0.1",
+      "model_b_mpt-30b-chat",
+      "model_b_mpt-7b-chat",
+      "model_b_nous-hermes-2-mixtral-8x7b-dpo",
+      "model_b_oasst-pythia-12b",
+      "model_b_openchat-3.5",
+      "model_b_openchat-3.5-0106",
+      "model_b_openhermes-2.5-mistral-7b",
+      "model_b_palm-2",
+      "model_b_pplx-70b-online",
+      "model_b_pplx-7b-online",
+      "model_b_qwen-14b-chat",
+      "model_b_qwen1.5-4b-chat",
+      "model_b_qwen1.5-72b-chat",
+      "model_b_qwen1.5-7b-chat",
+      "model_b_solar-10.7b-instruct-v1.0",
+      "model_b_stablelm-tuned-alpha-7b",
+      "model_b_starling-lm-7b-alpha",
+      "model_b_stripedhyena-nous-7b",
+      "model_b_tulu-2-dpo-70b",
+      "model_b_vicuna-13b",
+      "model_b_vicuna-33b",
+      "model_b_vicuna-7b",
+      "model_b_wizardlm-13b",
+      "model_b_wizardlm-70b",
+      "model_b_yi-34b-chat",
+      "model_b_zephyr-7b-alpha",
+      "model_b_zephyr-7b-beta",
+      "style_n_bullets_a",
+      "style_n_code_blocks_a",
+      "style_n_headers_a",
+      "style_n_newlines_a",
+      "style_n_exclam_a",
+      "style_n_question_a",
+      "style_n_refusal_a",
+      "style_upper_ratio_a",
+      "style_n_bullets_b",
+      "style_n_code_blocks_b",
+      "style_n_headers_b",
+      "style_n_newlines_b",
+      "style_n_exclam_b",
+      "style_n_question_b",
+      "style_n_refusal_b",
+      "style_upper_ratio_b",
+      "style_n_bullets_dif",
+      "style_n_code_blocks_dif",
+      "style_n_headers_dif",
+      "style_n_newlines_dif",
+      "style_n_exclam_dif",
+      "style_n_question_dif",
+      "style_n_refusal_dif",
+      "style_upper_ratio_dif",
+      "btd_a",
+      "btd_b",
+      "dif_btd",
+      "btd_p_a",
+      "btd_p_b",
+      "btd_p_tie"
+    ]
+  },
+  "btd": {
+    "nu": 0.97267,
+    "l2": 0.01,
+    "oof_folds": 5,
+    "ranking": [
+      [
+        "gpt-4-1106-preview",
+        1.8563
+      ],
+      [
+        "gpt-4-0125-preview",
+        1.7821
+      ],
+      [
+        "gpt-4-0314",
+        1.2273
+      ],
+      [
+        "gpt-4-0613",
+        1.0863
+      ],
+      [
+        "qwen1.5-72b-chat",
+        0.9624
+      ],
+      [
+        "mistral-medium",
+        0.9493
+      ],
+      [
+        "claude-1",
+        0.8629
+      ],
+      [
+        "gemini-pro-dev-api",
+        0.7221
+      ],
+      [
+        "claude-2.0",
+        0.7166
+      ],
+      [
+        "gemini-pro",
+        0.6747
+      ],
+      [
+        "mixtral-8x7b-instruct-v0.1",
+        0.6538
+      ],
+      [
+        "yi-34b-chat",
+        0.6319
+      ],
+      [
+        "claude-2.1",
+        0.6274
+      ],
+      [
+        "gpt-3.5-turbo-0613",
+        0.6037
+      ],
+      [
+        "gpt-3.5-turbo-0125",
+        0.5942
+      ],
+      [
+        "wizardlm-70b",
+        0.5936
+      ],
+      [
+        "claude-instant-1",
+        0.5457
+      ],
+      [
+        "llama-2-70b-chat",
+        0.4901
+      ],
+      [
+        "nous-hermes-2-mixtral-8x7b-dpo",
+        0.4805
+      ],
+      [
+        "vicuna-33b",
+        0.4744
+      ],
+      [
+        "starling-lm-7b-alpha",
+        0.467
+      ],
+      [
+        "gpt-3.5-turbo-0314",
+        0.4648
+      ],
+      [
+        "openhermes-2.5-mistral-7b",
+        0.3931
+      ],
+      [
+        "tulu-2-dpo-70b",
+        0.3852
+      ],
+      [
+        "pplx-70b-online",
+        0.3229
+      ],
+      [
+        "openchat-3.5",
+        0.3076
+      ],
+      [
+        "deepseek-llm-67b-chat",
+        0.2695
+      ],
+      [
+        "openchat-3.5-0106",
+        0.261
+      ],
+      [
+        "gpt-3.5-turbo-1106",
+        0.2256
+      ],
+      [
+        "mistral-7b-instruct-v0.2",
+        0.202
+      ],
+      [
+        "dolphin-2.2.1-mistral-7b",
+        0.1702
+      ],
+      [
+        "solar-10.7b-instruct-v1.0",
+        0.1686
+      ],
+      [
+        "llama2-70b-steerlm-chat",
+        0.1569
+      ],
+      [
+        "wizardlm-13b",
+        0.1302
+      ],
+      [
+        "zephyr-7b-beta",
+        0.1235
+      ],
+      [
+        "llama-2-13b-chat",
+        0.1101
+      ],
+      [
+        "llama-2-7b-chat",
+        0.0897
+      ],
+      [
+        "codellama-34b-instruct",
+        0.0849
+      ],
+      [
+        "pplx-7b-online",
+        0.0393
+      ],
+      [
+        "qwen1.5-7b-chat",
+        0.0375
+      ],
+      [
+        "vicuna-13b",
+        -0.0638
+      ],
+      [
+        "guanaco-33b",
+        -0.0797
+      ],
+      [
+        "mpt-30b-chat",
+        -0.0961
+      ],
+      [
+        "zephyr-7b-alpha",
+        -0.117
+      ],
+      [
+        "falcon-180b-chat",
+        -0.1851
+      ],
+      [
+        "qwen-14b-chat",
+        -0.1961
+      ],
+      [
+        "stripedhyena-nous-7b",
+        -0.1966
+      ],
+      [
+        "mistral-7b-instruct",
+        -0.276
+      ],
+      [
+        "palm-2",
+        -0.2781
+      ],
+      [
+        "vicuna-7b",
+        -0.4487
+      ],
+      [
+        "chatglm3-6b",
+        -0.5874
+      ],
+      [
+        "qwen1.5-4b-chat",
+        -0.6299
+      ],
+      [
+        "koala-13b",
+        -0.6454
+      ],
+      [
+        "gpt4all-13b-snoozy",
+        -1.019
+      ],
+      [
+        "mpt-7b-chat",
+        -1.2409
+      ],
+      [
+        "alpaca-13b",
+        -1.2493
+      ],
+      [
+        "RWKV-4-Raven-14B",
+        -1.2889
+      ],
+      [
+        "chatglm2-6b",
+        -1.3331
+      ],
+      [
+        "oasst-pythia-12b",
+        -1.3638
+      ],
+      [
+        "fastchat-t5-3b",
+        -1.5934
+      ],
+      [
+        "chatglm-6b",
+        -1.6754
+      ],
+      [
+        "stablelm-tuned-alpha-7b",
+        -2.0311
+      ],
+      [
+        "dolly-v2-12b",
+        -2.1285
+      ],
+      [
+        "llama-13b",
+        -2.2218
+      ]
+    ]
+  },
+  "times": {
+    "total_elapsed_sec": 1717.24,
+    "feature_building_sec": 54.09,
+    "tuning_sec": 518.72,
+    "training_sec": 15.21,
+    "val_inference_sec": 0.0537,
+    "test_inference_sec": 0.0531
+  },
+  "validation_metrics": {
+    "log_loss": 0.99311,
+    "accuracy": 0.5083,
+    "f1_macro": 0.49517,
+    "baseline_comparison": {
+      "trivial_log_loss": 1.09717,
+      "trivial_accuracy": 0.34947,
+      "log_loss_improvement": 0.10406,
+      "accuracy_improvement": 0.15883
+    },
+    "per_class": {
+      "model_a": {
+        "precision": 0.5291,
+        "recall": 0.585,
+        "f1": 0.5557
+      },
+      "model_b": {
+        "precision": 0.5204,
+        "recall": 0.6032,
+        "f1": 0.5587
+      },
+      "tie": {
+        "precision": 0.4492,
+        "recall": 0.3161,
+        "f1": 0.3711
+      }
+    }
+  },
+  "test_metrics": {
+    "log_loss": 0.99092,
+    "accuracy": 0.50668,
+    "f1_macro": 0.49577,
+    "baseline_comparison": {
+      "trivial_log_loss": 1.09717,
+      "trivial_accuracy": 0.34936,
+      "log_loss_improvement": 0.10625,
+      "accuracy_improvement": 0.15732
+    },
+    "per_class": {
+      "model_a": {
+        "precision": 0.5295,
+        "recall": 0.5839,
+        "f1": 0.5554
+      },
+      "model_b": {
+        "precision": 0.5218,
+        "recall": 0.584,
+        "f1": 0.5512
+      },
+      "tie": {
+        "precision": 0.4437,
+        "recall": 0.3335,
+        "f1": 0.3807
+      }
+    }
+  },
+  "variants_comparison": {
+    "(a) Sin BTD": {
+      "n_features": 165,
+      "log_loss": 0.99379,
+      "accuracy": 0.50749,
+      "f1_macro": 0.49437,
+      "params": {
+        "max_depth": 5,
+        "learning_rate": 0.02426001829551423,
+        "subsample": 0.5237453057231496,
+        "colsample_bytree": 0.3766509872702236,
+        "min_child_weight": 46,
+        "reg_lambda": 0.2010966699418391,
+        "augment_swap": true
+      },
+      "best_iteration": 1711,
+      "tuning_trials": 40,
+      "train_time_sec": 34.93
+    },
+    "(b) Con BTD": {
+      "n_features": 171,
+      "log_loss": 0.99311,
+      "accuracy": 0.5083,
+      "f1_macro": 0.49517,
+      "params": {
+        "max_depth": 4,
+        "learning_rate": 0.05128813363045768,
+        "subsample": 0.7067398964621144,
+        "colsample_bytree": 0.3734130783727589,
+        "min_child_weight": 10,
+        "reg_lambda": 4.740078029489769,
+        "augment_swap": true
+      },
+      "best_iteration": 718,
+      "tuning_trials": 40,
+      "train_time_sec": 15.21
+    }
+  },
+  "feature_importance_top": [
+    [
+      "btd_p_a",
+      0.09444
+    ],
+    [
+      "btd_p_b",
+      0.08589
+    ],
+    [
+      "dif_btd",
+      0.08322
+    ],
+    [
+      "dif_len",
+      0.07161
+    ],
+    [
+      "dif_words",
+      0.04625
+    ],
+    [
+      "style_n_newlines_dif",
+      0.04127
+    ],
+    [
+      "btd_p_tie",
+      0.03278
+    ],
+    [
+      "btd_b",
+      0.03104
+    ],
+    [
+      "dif_log_len",
+      0.03092
+    ],
+    [
+      "btd_a",
+      0.03005
+    ],
+    [
+      "style_n_refusal_dif",
+      0.02996
+    ],
+    [
+      "prompt_len",
+      0.02579
+    ],
+    [
+      "resp_b_len",
+      0.02362
+    ],
+    [
+      "style_upper_ratio_dif",
+      0.02206
+    ],
+    [
+      "style_n_refusal_b",
+      0.02153
+    ],
+    [
+      "resp_a_len",
+      0.02141
+    ],
+    [
+      "prompt_words",
+      0.02101
+    ],
+    [
+      "style_n_refusal_a",
+      0.02007
+    ],
+    [
+      "resp_a_words",
+      0.01743
+    ],
+    [
+      "style_upper_ratio_b",
+      0.01724
+    ]
+  ],
+  "position_bias_swap_check": {
+    "mean_absolute_swap_diff": 0.01211,
+    "p_a_to_p_b_diff": 0.0121,
+    "p_b_to_p_a_diff": 0.01212,
+    "p_tie_invariance_diff": 0.0121
+  },
+  "model_drive_link": null
+}

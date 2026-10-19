@@ -240,3 +240,6 @@ data/embeddings/
 cache/
 
 push.bat
+
+# Modelo 2 (XGBoost): puntajes del reward model (se comparten por Drive) y salidas de pruebas rápidas
+data/reward_scores.csv
