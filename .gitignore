@@ -224,3 +224,6 @@ data/raw/*
 # Los archivos procesados tampoco se versionan (se generan corriendo notebooks).
 data/processed/*
 !data/processed/.gitkeep
+
+# Pipelines entrenados: se regeneran con el notebook 06 y no se versionan.
+models/*.joblib
