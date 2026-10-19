@@ -1,0 +1,106 @@
+{
+  "model_id": "embeddings",
+  "model_name": "Embeddings Preentrenados (all-MiniLM-L6-v2) + Regresion Logistica",
+  "responsible": "Roberto Barreda (23354)",
+  "hardware": "NVIDIA GeForce RTX 5050 (DirectML GPU) + AMD Ryzen 5 8400F",
+  "hyperparameters": {
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2 (ONNX DirectML GPU)",
+    "embedding_dim": 384,
+    "classifier": "LogisticRegression(multi_class='multinomial')",
+    "C": 0.1,
+    "penalty": "l2",
+    "solver": "lbfgs",
+    "max_iter": 600,
+    "random_state": 42
+  },
+  "times": {
+    "total_elapsed_sec": 1144.41,
+    "encoding_sec": 649.97,
+    "training_sec": 94.98,
+    "val_inference_sec": 0.0287,
+    "test_inference_sec": 0.03
+  },
+  "validation_metrics": {
+    "log_loss": 1.02745,
+    "accuracy": 0.48671,
+    "f1_macro": 0.47473,
+    "baseline_comparison": {
+      "trivial_log_loss": 1.09717,
+      "trivial_accuracy": 0.34947,
+      "log_loss_improvement": 0.06972,
+      "accuracy_improvement": 0.13723
+    },
+    "per_class": {
+      "model_a": {
+        "precision": 0.5074,
+        "recall": 0.5615,
+        "f1": 0.533
+      },
+      "model_b": {
+        "precision": 0.5021,
+        "recall": 0.5723,
+        "f1": 0.5349
+      },
+      "tie": {
+        "precision": 0.4241,
+        "recall": 0.3071,
+        "f1": 0.3563
+      }
+    }
+  },
+  "test_metrics": {
+    "log_loss": 1.0143,
+    "accuracy": 0.48566,
+    "f1_macro": 0.47323,
+    "baseline_comparison": {
+      "trivial_log_loss": 1.09717,
+      "trivial_accuracy": 0.34936,
+      "log_loss_improvement": 0.08287,
+      "accuracy_improvement": 0.13631
+    },
+    "per_class": {
+      "model_a": {
+        "precision": 0.5039,
+        "recall": 0.5799,
+        "f1": 0.5392
+      },
+      "model_b": {
+        "precision": 0.5022,
+        "recall": 0.5538,
+        "f1": 0.5267
+      },
+      "tie": {
+        "precision": 0.4242,
+        "recall": 0.3033,
+        "f1": 0.3537
+      }
+    }
+  },
+  "variants_comparison": {
+    "Variante (a): Solo Longitud/Base": {
+      "log_loss": 1.02685,
+      "accuracy": 0.48102,
+      "f1_macro": 0.45214,
+      "train_time_sec": 2.89
+    },
+    "Variante (b): Solo Embeddings": {
+      "log_loss": 1.07541,
+      "accuracy": 0.43295,
+      "f1_macro": 0.42467,
+      "train_time_sec": 32.32
+    },
+    "Variante (c): Híbrido Longitud + Embeddings": {
+      "log_loss": 1.02745,
+      "accuracy": 0.48671,
+      "f1_macro": 0.47473,
+      "train_time_sec": 84.15
+    }
+  },
+  "position_bias_swap_check": {
+    "mean_absolute_swap_diff": 0.07534,
+    "p_a_to_p_b_diff": 0.07653,
+    "p_b_to_p_a_diff": 0.07608,
+    "p_tie_invariance_diff": 0.07342
+  },
+  "model_drive_link": "https://drive.google.com/drive/folders/cc3084_embeddings_roberto_checkpoints"
+}
