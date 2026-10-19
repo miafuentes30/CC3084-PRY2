@@ -1,0 +1,896 @@
+{
+  "model_name": "Regresión logística multinomial (Variante B)",
+  "seed": 42,
+  "label_order": {
+    "0": "gana A",
+    "1": "gana B",
+    "2": "empate"
+  },
+  "probability_order": [
+    "p_a",
+    "p_b",
+    "p_tie"
+  ],
+  "splits": {
+    "source": "data/splits.csv",
+    "train_n": 40180,
+    "validation_n": 8613,
+    "test_n": 8613,
+    "grouping": "prompt_text"
+  },
+  "features": {
+    "numeric": [
+      "prompt_len",
+      "resp_a_len",
+      "resp_b_len",
+      "prompt_words",
+      "resp_a_words",
+      "resp_b_words",
+      "n_turns",
+      "dif_len",
+      "dif_words",
+      "log_prompt_len",
+      "log_resp_a_len",
+      "log_resp_b_len",
+      "dif_log_len"
+    ],
+    "categorical_variant_b": [
+      "model_a",
+      "model_b"
+    ],
+    "forbidden_and_excluded": [
+      "winner",
+      "winner_model_a",
+      "winner_model_b",
+      "winner_tie"
+    ]
+  },
+  "estimator": {
+    "solver": "lbfgs",
+    "regularization": "L2",
+    "max_iter": 1000,
+    "C_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0
+    ]
+  },
+  "smoke_test": {
+    "n_rows": 900,
+    "passed": true
+  },
+  "hyperparameter_search": {
+    "variant_a": {
+      "best_C": 0.01,
+      "results": [
+        {
+          "C": 0.01,
+          "mean_log_loss": 1.0661315970085075,
+          "std_log_loss": 0.003288447373599646,
+          "fold_log_loss": [
+            1.0630365778021806,
+            1.0686422438672638,
+            1.0648553131015905,
+            1.0705269743070536,
+            1.063596875964449
+          ],
+          "mean_fit_time_seconds": 0.12020340001909062,
+          "convergence_warning_count": 0
+        },
+        {
+          "C": 0.1,
+          "mean_log_loss": 1.0661790493005012,
+          "std_log_loss": 0.0033895171580682623,
+          "fold_log_loss": [
+            1.062846242573608,
+            1.0685708786952215,
+            1.064732678695083,
+            1.070850161601698,
+            1.063895284936896
+          ],
+          "mean_fit_time_seconds": 0.13221933997701854,
+          "convergence_warning_count": 0
+        },
+        {
+          "C": 1.0,
+          "mean_log_loss": 1.0661885533603401,
+          "std_log_loss": 0.003407380120621091,
+          "fold_log_loss": [
+            1.0628214118164314,
+            1.0685618819554474,
+            1.0647152414776413,
+            1.0709046885303726,
+            1.0639395430218075
+          ],
+          "mean_fit_time_seconds": 0.126212279999163,
+          "convergence_warning_count": 0
+        },
+        {
+          "C": 10.0,
+          "mean_log_loss": 1.0661897450670659,
+          "std_log_loss": 0.0034092735273125213,
+          "fold_log_loss": [
+            1.06281884566852,
+            1.068561011208982,
+            1.06471410287076,
+            1.0709106071539318,
+            1.063944158433134
+          ],
+          "mean_fit_time_seconds": 0.1262806799961254,
+          "convergence_warning_count": 0
+        }
+      ],
+      "cv_folds": 5,
+      "cv_time_seconds": 2.668101800023578,
+      "convergence_warnings": [],
+      "convergence_warning_count": 0
+    },
+    "variant_b": {
+      "best_C": 1.0,
+      "results": [
+        {
+          "C": 0.01,
+          "mean_log_loss": 1.0344056668625272,
+          "std_log_loss": 0.0018828640857501207,
+          "fold_log_loss": [
+            1.0332507120251102,
+            1.0361213858622431,
+            1.0331099442729492,
+            1.0367674024946238,
+            1.0327788896577097
+          ],
+          "mean_fit_time_seconds": 0.3066621799953282,
+          "convergence_warning_count": 0
+        },
+        {
+          "C": 0.1,
+          "mean_log_loss": 1.0263177928336682,
+          "std_log_loss": 0.0009894801106363163,
+          "fold_log_loss": [
+            1.0260087665658764,
+            1.0279521647309355,
+            1.0252723514522177,
+            1.0262713659697102,
+            1.026084315449601
+          ],
+          "mean_fit_time_seconds": 0.514820259984117,
+          "convergence_warning_count": 0
+        },
+        {
+          "C": 1.0,
+          "mean_log_loss": 1.026131445765965,
+          "std_log_loss": 0.0011871378565362907,
+          "fold_log_loss": [
+            1.0259481252936695,
+            1.028002310904943,
+            1.0251183455573272,
+            1.025142444164131,
+            1.0264460029097535
+          ],
+          "mean_fit_time_seconds": 0.6157791800098493,
+          "convergence_warning_count": 0
+        },
+        {
+          "C": 10.0,
+          "mean_log_loss": 1.0262245010925874,
+          "std_log_loss": 0.001234331047372187,
+          "fold_log_loss": [
+            1.0259342244893377,
+            1.028154967020668,
+            1.0252766986299346,
+            1.0251215699128415,
+            1.0266350454101552
+          ],
+          "mean_fit_time_seconds": 0.7296574400155805,
+          "convergence_warning_count": 0
+        }
+      ],
+      "cv_folds": 5,
+      "cv_time_seconds": 11.136488699994516,
+      "convergence_warnings": [],
+      "convergence_warning_count": 0
+    }
+  },
+  "chosen_hyperparameters": {
+    "variant_a": {
+      "C": 0.01
+    },
+    "variant_b": {
+      "C": 1.0
+    }
+  },
+  "selection": {
+    "model": "variant_b",
+    "reason": "Variante principal preespecificada: variables numéricas más identidad de model_a y model_b; test no intervino en la selección.",
+    "selected_before_test_evaluation": true
+  },
+  "validation_metrics": {
+    "baseline": {
+      "log_loss": 1.0971651825612534,
+      "f1_macro": 0.1726461900255241,
+      "accuracy": 0.3494717287820736,
+      "per_class": {
+        "a": {
+          "label": 0,
+          "name": "Gana A",
+          "precision": 0.3494717287820736,
+          "recall": 1.0,
+          "f1": 0.5179385700765723,
+          "support": 3010
+        },
+        "b": {
+          "label": 1,
+          "name": "Gana B",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2946
+        },
+        "tie": {
+          "label": 2,
+          "name": "Empate",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2657
+        }
+      },
+      "confusion_matrix": [
+        [
+          3010,
+          0,
+          0
+        ],
+        [
+          2946,
+          0,
+          0
+        ],
+        [
+          2657,
+          0,
+          0
+        ]
+      ],
+      "inference_time_seconds": 0.000492700026370585,
+      "n_observations": 8613,
+      "class_priors": [
+        0.3493280238924838,
+        0.34221005475360877,
+        0.30846192135390743
+      ],
+      "fit_time_seconds": 0.0001002000062726438,
+      "cv_time_seconds": 0.0,
+      "training_time_total_seconds": 0.0001002000062726438
+    },
+    "variant_a": {
+      "log_loss": 1.0654273684888926,
+      "f1_macro": 0.42276194214131957,
+      "accuracy": 0.4507140369209335,
+      "per_class": {
+        "a": {
+          "label": 0,
+          "name": "Gana A",
+          "precision": 0.45137285091095714,
+          "recall": 0.5843853820598006,
+          "f1": 0.5093383523961199,
+          "support": 3010
+        },
+        "b": {
+          "label": 1,
+          "name": "Gana B",
+          "precision": 0.44955898566703417,
+          "recall": 0.5536320434487441,
+          "f1": 0.4961971402494676,
+          "support": 2946
+        },
+        "tie": {
+          "label": 2,
+          "name": "Empate",
+          "precision": 0.4522058823529412,
+          "recall": 0.18517124576590138,
+          "f1": 0.26275033377837115,
+          "support": 2657
+        }
+      },
+      "confusion_matrix": [
+        [
+          1759,
+          959,
+          292
+        ],
+        [
+          1011,
+          1631,
+          304
+        ],
+        [
+          1127,
+          1038,
+          492
+        ]
+      ],
+      "inference_time_seconds": 0.004556599946226925,
+      "n_observations": 8613,
+      "fit_time_seconds": 0.18325259996345267,
+      "cv_time_seconds": 2.668101800023578,
+      "training_time_total_seconds": 2.8513543999870308
+    },
+    "variant_b": {
+      "log_loss": 1.0274197752971734,
+      "f1_macro": 0.45179975798698696,
+      "accuracy": 0.48055265296644606,
+      "per_class": {
+        "a": {
+          "label": 0,
+          "name": "Gana A",
+          "precision": 0.4868773433315479,
+          "recall": 0.6039867109634551,
+          "f1": 0.5391459074733096,
+          "support": 3010
+        },
+        "b": {
+          "label": 1,
+          "name": "Gana B",
+          "precision": 0.49013698630136987,
+          "recall": 0.6072640868974881,
+          "f1": 0.542449969678593,
+          "support": 2946
+        },
+        "tie": {
+          "label": 2,
+          "name": "Empate",
+          "precision": 0.43287225386493083,
+          "recall": 0.20022581859239744,
+          "f1": 0.27380339680905813,
+          "support": 2657
+        }
+      },
+      "confusion_matrix": [
+        [
+          1818,
+          830,
+          362
+        ],
+        [
+          822,
+          1789,
+          335
+        ],
+        [
+          1094,
+          1031,
+          532
+        ]
+      ],
+      "inference_time_seconds": 0.014684000052511692,
+      "n_observations": 8613,
+      "fit_time_seconds": 1.0252477999893017,
+      "cv_time_seconds": 11.136488699994516,
+      "training_time_total_seconds": 12.161736499983817
+    }
+  },
+  "test_metrics": {
+    "baseline": {
+      "log_loss": 1.0971675727427939,
+      "f1_macro": 0.17260368267079676,
+      "accuracy": 0.3493556252176942,
+      "per_class": {
+        "a": {
+          "label": 0,
+          "name": "Gana A",
+          "precision": 0.3493556252176942,
+          "recall": 1.0,
+          "f1": 0.5178110480123903,
+          "support": 3009
+        },
+        "b": {
+          "label": 1,
+          "name": "Gana B",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2947
+        },
+        "tie": {
+          "label": 2,
+          "name": "Empate",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2657
+        }
+      },
+      "confusion_matrix": [
+        [
+          3009,
+          0,
+          0
+        ],
+        [
+          2947,
+          0,
+          0
+        ],
+        [
+          2657,
+          0,
+          0
+        ]
+      ],
+      "inference_time_seconds": 6.609997944906354e-05,
+      "n_observations": 8613,
+      "class_priors": [
+        0.3493280238924838,
+        0.34221005475360877,
+        0.30846192135390743
+      ],
+      "fit_time_seconds": 0.0001002000062726438,
+      "cv_time_seconds": 0.0,
+      "training_time_total_seconds": 0.0001002000062726438
+    },
+    "variant_a": {
+      "log_loss": 1.065372834943932,
+      "f1_macro": 0.4140858303614153,
+      "accuracy": 0.439684198304888,
+      "per_class": {
+        "a": {
+          "label": 0,
+          "name": "Gana A",
+          "precision": 0.4406647623993768,
+          "recall": 0.5639747424393486,
+          "f1": 0.4947521865889213,
+          "support": 3009
+        },
+        "b": {
+          "label": 1,
+          "name": "Gana B",
+          "precision": 0.444910514541387,
+          "recall": 0.5398710553104853,
+          "f1": 0.4878123562777863,
+          "support": 2947
+        },
+        "tie": {
+          "label": 2,
+          "name": "Empate",
+          "precision": 0.42074198988195616,
+          "recall": 0.1878057960105382,
+          "f1": 0.25969294821753836,
+          "support": 2657
+        }
+      },
+      "confusion_matrix": [
+        [
+          1697,
+          979,
+          333
+        ],
+        [
+          1002,
+          1591,
+          354
+        ],
+        [
+          1152,
+          1006,
+          499
+        ]
+      ],
+      "inference_time_seconds": 0.004392700036987662,
+      "n_observations": 8613,
+      "fit_time_seconds": 0.18325259996345267,
+      "cv_time_seconds": 2.668101800023578,
+      "training_time_total_seconds": 2.8513543999870308
+    },
+    "variant_b": {
+      "log_loss": 1.0252766594051452,
+      "f1_macro": 0.4505208114996722,
+      "accuracy": 0.4776500638569604,
+      "per_class": {
+        "a": {
+          "label": 0,
+          "name": "Gana A",
+          "precision": 0.4876410531972058,
+          "recall": 0.6031904287138584,
+          "f1": 0.5392957955727232,
+          "support": 3009
+        },
+        "b": {
+          "label": 1,
+          "name": "Gana B",
+          "precision": 0.49325463743676223,
+          "recall": 0.5955208686800135,
+          "f1": 0.5395849346656418,
+          "support": 2947
+        },
+        "tie": {
+          "label": 2,
+          "name": "Empate",
+          "precision": 0.4081020255063766,
+          "recall": 0.20474219044034625,
+          "f1": 0.27268170426065164,
+          "support": 2657
+        }
+      },
+      "confusion_matrix": [
+        [
+          1815,
+          806,
+          388
+        ],
+        [
+          791,
+          1755,
+          401
+        ],
+        [
+          1116,
+          997,
+          544
+        ]
+      ],
+      "inference_time_seconds": 0.01456860004691407,
+      "n_observations": 8613,
+      "fit_time_seconds": 1.0252477999893017,
+      "cv_time_seconds": 11.136488699994516,
+      "training_time_total_seconds": 12.161736499983817
+    }
+  },
+  "validation_deltas_variant_b_minus_a": {
+    "log_loss": -0.0380075931917192,
+    "f1_macro": 0.029037815845667392,
+    "accuracy": 0.029838616045512578
+  },
+  "swap_test": {
+    "mean_absolute_errors": {
+      "p_a_original_vs_p_b_swapped": 0.030543783265822164,
+      "p_b_original_vs_p_a_swapped": 0.030618442957617956,
+      "p_tie_original_vs_p_tie_swapped": 0.027359708996138724
+    },
+    "aggregate_mae": 0.029507311739859616,
+    "consistency_score_1_minus_mae": 0.9704926882601403,
+    "n_observations": 8613
+  },
+  "length_analysis_validation": {
+    "similarity_threshold_relative": 0.1,
+    "groups": {
+      "A más extensa (>10%)": {
+        "n": 3670,
+        "observed_proportions": {
+          "a": 0.44959128065395093,
+          "b": 0.2553133514986376,
+          "tie": 0.29509536784741147
+        },
+        "mean_predicted_probabilities": {
+          "a": 0.4270508700700903,
+          "b": 0.26394823969532527,
+          "tie": 0.3090008902345848
+        },
+        "accuracy": 0.4940054495912807,
+        "log_loss": 1.0176013362692544
+      },
+      "similares (±10%)": {
+        "n": 1243,
+        "observed_proportions": {
+          "a": 0.32260659694288013,
+          "b": 0.2936444086886565,
+          "tie": 0.3837489943684634
+        },
+        "mean_predicted_probabilities": {
+          "a": 0.3534433963108204,
+          "b": 0.32946987031172104,
+          "tie": 0.3170867333774587
+        },
+        "accuracy": 0.43765084473049076,
+        "log_loss": 1.0530813295301944
+      },
+      "B más extensa (>10%)": {
+        "n": 3700,
+        "observed_proportions": {
+          "a": 0.2591891891891892,
+          "b": 0.44432432432432434,
+          "tie": 0.2964864864864865
+        },
+        "mean_predicted_probabilities": {
+          "a": 0.26514306640861407,
+          "b": 0.43096651866423413,
+          "tie": 0.3038904149271511
+        },
+        "accuracy": 0.48162162162162164,
+        "log_loss": 1.0285377102487459
+      }
+    },
+    "eda_historical_longer_response_win_rate": 0.6163,
+    "validation_longer_response_win_rate": 0.6214898268034303,
+    "validation_decisive_unequal_n": 5947
+  },
+  "coefficient_analysis": {
+    "standardized_numeric_coefficients": [
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__prompt_len",
+        "coefficient": 0.047209201920816
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__resp_a_len",
+        "coefficient": 0.06215124094694449
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__resp_b_len",
+        "coefficient": 0.025040264094325
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__prompt_words",
+        "coefficient": -0.03282459777987426
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__resp_a_words",
+        "coefficient": -0.010612169721661653
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__resp_b_words",
+        "coefficient": -0.057411059623867694
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__n_turns",
+        "coefficient": -0.02311840109423984
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__dif_len",
+        "coefficient": 0.049602657003514766
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__dif_words",
+        "coefficient": 0.06321207178398537
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__log_prompt_len",
+        "coefficient": -0.03325117276756898
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__log_resp_a_len",
+        "coefficient": 0.0757384921378896
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__log_resp_b_len",
+        "coefficient": -0.009980928389670338
+      },
+      {
+        "class": 0,
+        "class_name": "Gana A",
+        "feature": "numeric__dif_log_len",
+        "coefficient": 0.1034982952813007
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__prompt_len",
+        "coefficient": 0.0032987587640611322
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__resp_a_len",
+        "coefficient": 0.0005585793414762898
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__resp_b_len",
+        "coefficient": 0.03848065021126174
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__prompt_words",
+        "coefficient": 0.012579801666537842
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__resp_a_words",
+        "coefficient": -0.06686409003095795
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__resp_b_words",
+        "coefficient": -0.023608831377101618
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__n_turns",
+        "coefficient": 0.02604298410594974
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__dif_len",
+        "coefficient": -0.052154881855881255
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__dif_words",
+        "coefficient": -0.05734518895334
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__log_prompt_len",
+        "coefficient": -0.05654888632383757
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__log_resp_a_len",
+        "coefficient": 0.015900531544745064
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__log_resp_b_len",
+        "coefficient": 0.10506641232653266
+      },
+      {
+        "class": 1,
+        "class_name": "Gana B",
+        "feature": "numeric__dif_log_len",
+        "coefficient": -0.10763163555642682
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__prompt_len",
+        "coefficient": -0.050507960684863865
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__resp_a_len",
+        "coefficient": -0.0627098202883861
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__resp_b_len",
+        "coefficient": -0.06352091430559283
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__prompt_words",
+        "coefficient": 0.020244796113331097
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__resp_a_words",
+        "coefficient": 0.0774762597526227
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__resp_b_words",
+        "coefficient": 0.0810198910009989
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__n_turns",
+        "coefficient": -0.002924583011717433
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__dif_len",
+        "coefficient": 0.0025522248523759746
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__dif_words",
+        "coefficient": -0.005866882830675462
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__log_prompt_len",
+        "coefficient": 0.08980005909141
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__log_resp_a_len",
+        "coefficient": -0.09163902368262236
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__log_resp_b_len",
+        "coefficient": -0.0950854839368729
+      },
+      {
+        "class": 2,
+        "class_name": "Empate",
+        "feature": "numeric__dif_log_len",
+        "coefficient": 0.004133340275116048
+      }
+    ],
+    "high_correlation_pairs_abs_ge_0_90": [
+      {
+        "feature_1": "prompt_len",
+        "feature_2": "prompt_words",
+        "correlation": 0.9656158256377851
+      },
+      {
+        "feature_1": "resp_a_len",
+        "feature_2": "resp_a_words",
+        "correlation": 0.9886316248238093
+      },
+      {
+        "feature_1": "resp_b_len",
+        "feature_2": "resp_b_words",
+        "correlation": 0.984671464828291
+      },
+      {
+        "feature_1": "dif_len",
+        "feature_2": "dif_words",
+        "correlation": 0.9759618484806235
+      }
+    ],
+    "interpretation_note": "Los coeficientes numéricos corresponden a variables estandarizadas. La colinealidad y la regularización L2 reparten señal entre variables redundantes; no deben interpretarse como efectos causales aislados."
+  },
+  "convergence": {
+    "variant_a_cv": [],
+    "variant_b_cv": [],
+    "variant_a_final": [],
+    "variant_b_final": []
+  },
+  "artifacts": {
+    "validation_predictions": "results/preds/logreg_val.csv",
+    "test_predictions": "results/preds/logreg_test.csv",
+    "pipeline": "models/logreg_pipeline.joblib",
+    "serialization_max_probability_difference": 0.0
+  },
+  "versions": {
+    "scikit_learn": "1.8.0"
+  },
+  "methodological_notes": {
+    "test_usage": "Evaluado una sola vez después de fijar la Variante B como modelo final.",
+    "causality": "Las asociaciones predictivas no demuestran causalidad ni que mayor longitud implique mayor calidad."
+  },
+  "figures": [
+    "C:\\Users\\miafu\\Downloads\\CC3084-PRY2\\docs\\figures\\logreg_comparacion_modelos.png",
+    "C:\\Users\\miafu\\Downloads\\CC3084-PRY2\\docs\\figures\\logreg_matriz_confusion.png",
+    "C:\\Users\\miafu\\Downloads\\CC3084-PRY2\\docs\\figures\\logreg_rendimiento_clases.png",
+    "C:\\Users\\miafu\\Downloads\\CC3084-PRY2\\docs\\figures\\logreg_busqueda_c.png",
+    "C:\\Users\\miafu\\Downloads\\CC3084-PRY2\\docs\\figures\\logreg_consistencia_ab.png",
+    "C:\\Users\\miafu\\Downloads\\CC3084-PRY2\\docs\\figures\\logreg_longitud_validacion.png"
+  ]
+}
