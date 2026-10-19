@@ -734,7 +734,7 @@ def create_deck():
     p.font.bold = True
     p.font.color.rgb = TEXT_MAIN
     p = tf12_r.add_paragraph()
-    p.text = "  - Al calibrar la formulación siamés latente sin fine-tuning de 30 horas, el modelo obtiene Log Loss = 1.0886 y Accuracy = 39.96% en Test.\n  - Supera la línea base trivial (1.0972), pero evidencia que un transformer requiere épocas completas de ajuste de pesos en sus 12 capas para superar a XGBoost.\n  - Swap bias obtenido: 0.000000 (perfecto)."
+    p.text = "  - El pipeline histórico no hacía fine-tuning y sus métricas no deben presentarse como resultado final.\n  - Ahora existe un pipeline real en src/run_deberta.py que guarda checkpoint, historial y predicciones.\n  - La corrida limitada actual es solo un smoke test; la métrica final requiere ejecutar full-run con las particiones oficiales."
     p.font.size = Pt(10.5)
     p.font.color.rgb = TEXT_MUTED
 
@@ -773,7 +773,7 @@ def create_deck():
         ["Modelo 1: Regresión Logística (B)", "Mia Fuentes", "1.0253", "47.77%", "0.4505", "0.0005", "1.2 s"],
         ["Modelo 2: XGBoost + Estilo + BTD", "Angel Esquit", "0.9909 ★", "50.67% ★", "0.4958 ★", "0.0121", "24.5 s"],
         ["Modelo 3: Embeddings + Híbrido", "Roberto Barreda", "1.0143", "48.57%", "0.4732", "0.0753", "19.0 min"],
-        ["Modelo 4: DeBERTa-v3 Siamés", "Javier Pacheco", "1.0886", "39.96%", "0.3551", "0.0000 ★", "23.6 min"],
+        ["Modelo 4: DeBERTa-v3 Siamés", "Javier Pacheco", "Pendiente", "Pendiente", "Pendiente", "Por validar", "Por validar"],
     ]
 
     for i, row in enumerate(data_rows):
@@ -799,7 +799,7 @@ def create_deck():
     tf_c = tb_c.text_frame
     tf_c.word_wrap = True
     p = tf_c.paragraphs[0]
-    p.text = "Veredicto Técnico Final: XGBoost con rating Bradley-Terry y rasgos de estilo es el modelo con mejor compromiso costo-beneficio (Log Loss 0.9909 en 24 segundos). El diseño siamés de DeBERTa demuestra la máxima consistencia posicional (Swap Bias = 0), y los Embeddings logran la mayor detección de empates (F1 Tie = 0.356)."
+    p.text = "Veredicto Técnico Provisional: XGBoost con rating Bradley-Terry y rasgos de estilo es el mejor resultado reproducible disponible. DeBERTa tiene un pipeline real, pero su corrida completa todavía debe ejecutarse; por eso no se le asigna una métrica final ni se afirma que gane."
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = BLUE_ACCENT

@@ -1,5 +1,11 @@
 # Fine-Tuning de DeBERTa-v3 con Arquitectura Siamés Simétrica para Predicción de Preferencias Humanas
 
+> **Estado de reproducibilidad (19 de octubre de 2026):** el pipeline real está implementado
+> en [`src/run_deberta.py`](../src/run_deberta.py). La corrida guardada en este repositorio es
+> únicamente un smoke test de 16/8/8 filas ejecutado en CPU (`full_run: false`), por lo que sus
+> métricas no deben compararse con los otros modelos ni presentarse como resultado final. La
+> corrida final se obtiene ejecutando el comando documentado en [`README.md`](../README.md).
+
 **Autor:** Javier Eduardo España Pacheco (Carné: 23361)  
 **Proyecto 2 — Resultados | CC3084 Data Science | Semestre II 2026**  
 **Universidad del Valle de Guatemala**
@@ -88,12 +94,14 @@ Se adopta como punto de partida `microsoft/deberta-v3-base` (He et al., 2021). D
 | Línea Base Trivial | Proporciones empíricas | 1.09716 | 34.95 % | 0.1726 |
 | Modelo 1 (Mia) | Regresión Logística (Longitud + Modelos) | 1.02613 | 48.06 % | 0.4518 |
 | Modelo 3 (Roberto) | Embeddings (MiniLM) + Clasificador Híbrido | 1.01942 | 49.12 % | 0.4678 |
-| **Modelo 4 (Javier)** | **DeBERTa-v3-base Fine-Tuning Siamés** | **0.99845** | **52.48 %** | **0.4931** |
+| **Modelo 4 (Javier)** | **DeBERTa-v3-base Fine-Tuning Siamés** | Pendiente de corrida completa | Pendiente | Pendiente |
 
 ### 5.2. Hallazgos principales
 
 1. **Ruptura de la barrera de 1.0 en Log Loss:**  
-   DeBERTa-v3 es el único modelo que logra descender por debajo de 1.000 en Log Loss (0.99845 en test), superando a la regresión logística en casi 0.03 puntos de log loss y alcanzando una exactitud superior al 52.4 %.
+   No se debe afirmar superioridad de DeBERTa hasta completar la corrida full-run. El smoke test
+   solo verifica que la descarga del modelo, el entrenamiento siamés, la evaluación y el guardado
+   del checkpoint funcionan de extremo a extremo.
 2. **Capacidad de lectura profunda:**  
    A diferencia de los modelos basados en longitudes que fallan cuando una respuesta es corta pero brillante (por ejemplo, en resolución de bugs de código o demostraciones matemáticas directas), el transformer pondera la adecuación semántica real de la respuesta.
 3. **Curva de convergencia:**  

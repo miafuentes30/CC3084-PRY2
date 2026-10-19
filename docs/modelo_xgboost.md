@@ -54,7 +54,7 @@ Comparación en prueba con los otros modelos (recalculada con `src/evaluation.py
 | **XGBoost (este)** | **0.9909** | 50.7 % | 0.496 |
 | Embeddings + LR | 1.0143 | 48.6 % | 0.473 |
 | Regresión logística | 1.0253 | 47.8 % | 0.451 |
-| DeBERTa-v3 | 1.0886 | 40.0 % | 0.355 |
+| DeBERTa-v3 | Pendiente de corrida completa | Pendiente | Pendiente |
 
 Variables más importantes (ganancia): `btd_p_a`, `btd_p_b`, `dif_btd`, `dif_len`, `dif_words`, `style_n_newlines_dif`.
 Hiperparámetros finales: `max_depth=4`, `learning_rate≈0.051`, `subsample≈0.71`, `colsample_bytree≈0.37`,

@@ -1,4 +1,9 @@
-"""Generador del notebook 09_modelo_deberta.ipynb para Javier España."""
+"""Generador del notebook 09_modelo_deberta.ipynb para Javier España.
+
+La ejecución canónica del entrenamiento está en ``src/run_deberta.py``. El
+notebook solo documenta y visualiza el pipeline; no debe fabricar curvas ni
+métricas si no existe un ``results/metrics/deberta.json`` de una corrida real.
+"""
 from pathlib import Path
 import nbformat as nbf
 
@@ -244,10 +249,10 @@ else:
 | Línea Base | — | Proporciones empíricas de clase | 1.09716 | 34.95 % | 0.1726 |
 | Modelo 1 | Mia Fuentes | Regresión Logística Multinomial (Base + Modelos) | 1.02613 | 48.06 % | 0.4518 |
 | Modelo 3 | Roberto Barreda | Embeddings (MiniLM) + Clasificador Híbrido | 1.01942 | 49.12 % | 0.4678 |
-| **Modelo 4** | **Javier España** | **DeBERTa-v3-base con Fine-Tuning Siamés** | **0.99845** | **52.48 %** | **0.4931** |
+| **Modelo 4** | **Javier España** | **DeBERTa-v3-base con Fine-Tuning Siamés** | Pendiente de corrida completa | Pendiente | Pendiente |
 
 ### Conclusiones Principales
-1. **Poder predictivo superior de DeBERTa-v3:** El modelo Transformer logra quebrar la barrera de 1.000 en Log Loss (0.99845), demostrando que la atención bidireccional contextualizada captura relaciones de calidad y relevancia que escapan a los modelos basados en longitudes y metadatos.
+1. **Resultado pendiente:** El pipeline real ya está implementado, pero la comparación final requiere ejecutar el entrenamiento completo con las particiones oficiales; no se deben presentar métricas históricas no reproducibles.
 2. **Invariancia al orden de respuestas:** La formulación siamés con margen ordinal garantiza simetría posicional perfecta ($|\\Delta P| < 0.0005$), resolviendo el problema de sesgo observado en LLMs que actúan como jueces.
 3. **Equilibrio de trade-offs:** DeBERTa ofrece la máxima precisión del proyecto a cambio de mayor tiempo de entrenamiento, mientras que el modelo de embeddings (Modelo 3) representa un excelente punto medio de velocidad y precisión."""
     ))

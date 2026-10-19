@@ -280,11 +280,11 @@ def build_pdf():
         [
             Paragraph("Modelo 4: DeBERTa-v3 Siamés", table_cell_bold),
             Paragraph("Javier Pacheco", table_cell_style),
-            Paragraph("1.0886", table_cell_style),
-            Paragraph("39.96%", table_cell_style),
-            Paragraph("0.3551", table_cell_style),
-            Paragraph("<b>0.0000 ★</b>", table_cell_bold),
-            Paragraph("23.6 min", table_cell_style),
+            Paragraph("Pendiente", table_cell_style),
+            Paragraph("Pendiente", table_cell_style),
+            Paragraph("Pendiente", table_cell_style),
+            Paragraph("Por validar", table_cell_style),
+            Paragraph("Por validar", table_cell_style),
         ],
     ]
 
@@ -455,11 +455,11 @@ def build_pdf():
     story.append(PageBreak())
     story.append(HRFlowable(width="100%", thickness=1, color=COLOR_PACHECO, spaceBefore=8, spaceAfter=8))
     story.append(Paragraph("SECCIÓN 4 · JAVIER PACHECO (Carné: 23361)", h1_style))
-    story.append(Paragraph("<b>Rol Asignado:</b> Transformer DeBERTa-v3 Siamés, Lecciones de Fine-Tuning, App Streamlit E2E y Conclusiones", subtitle_style))
+    story.append(Paragraph("<b>Rol Asignado:</b> Pipeline real de fine-tuning siamés de DeBERTa-v3, validación honesta, App Streamlit E2E y Conclusiones", subtitle_style))
 
     story.append(Paragraph("A. Conocimiento E2E y Conceptos Clave que Pacheco Debe Dominar:", h2_style))
     story.append(Paragraph("• <b>Arquitectura Siamés Simétrica vs. Secuencia Única:</b> La arquitectura típica de concatenar [CLS] Prompt [SEP] A [SEP] B sufre de sesgo posicional severo y desborda 1,024 tokens. Pacheco implementó un diseño siamés con pesos compartidos donde Rama A procesa (Prompt, A) y Rama B procesa (Prompt, B). Al modelar Delta = s_A - s_B y logit de empate tau - |Delta|, el sesgo de posición teórico es idénticamente CERO.", bullet_style))
-    story.append(Paragraph("• <b>Honestidad Científica en la Exposición:</b> Explicar con madurez técnica la diferencia entre la meta teórica de la literatura (Kaggle top 10% con clusters A100 que alcanzan ~0.998 con 30 horas de cómputo) y la corrida experimental en hardware local con 8GB de VRAM. La formulación siamés latente obtuvo <b>Log Loss = 1.0886</b> y <b>Accuracy = 39.96%</b> con un <b>Swap Bias de 0.000000 estricto</b>. Esto enseña que un Transformer requiere épocas completas de ajuste de pesos en sus 12 capas para superar a árboles optimizados.", bullet_style))
+    story.append(Paragraph("• <b>Honestidad Científica en la Exposición:</b> El archivo histórico que afirmaba 1.0886/39.96% no provenía de fine-tuning y no debe presentarse como resultado. Ahora el pipeline real está en <b>src/run_deberta.py</b>; la corrida limitada disponible es solo un smoke test y la métrica final queda pendiente hasta ejecutar el comando full-run.", bullet_style))
     story.append(Paragraph("• <b>Aplicación Streamlit E2E:</b> Cumple el 100% de la rúbrica de 20 puntos: preprocesamiento invisible en memoria, 4 pestañas interactivas (Resumen, Exploración Plotly, Resultados de Modelos y Consola de Clasificación en Vivo con ejemplos precargados), filtros con teoría del color y opción para colapsar métricas técnicas.", bullet_style))
     story.append(Paragraph("• <b>Conclusiones E2E:</b> Responder las preguntas científicas del proyecto: la longitud importa pero el estilo y Elo dominan (XGBoost 0.9909); los embeddings aportan empates; y la propuesta final es un ensamble ponderado 60% XGBoost + 40% Embeddings.", bullet_style))
 
@@ -471,7 +471,7 @@ def build_pdf():
          "«Muchas gracias, Roberto. Saludos a todos, mi nombre es Javier Pacheco y para cerrar la presentación técnica les expondré el Modelo 4 con DeBERTa-v3, la comparativa global de los cuatro modelos y nuestra aplicación web interactiva.\n\n"
          "En la literatura de modelado de recompensas para RLHF, concatenar ambas respuestas en una sola secuencia genera un sesgo de posición inducido por el orden de los tokens y desborda la memoria VRAM. Para resolverlo, implementé un diseño Siamés Simétrico con pesos compartidos. Un único codificador evalúa de forma idéntica (Prompt, A) produciendo un puntaje escalar s_A, y (Prompt, B) produciendo s_B. El margen ordinal Delta = s_A - s_B modela la victoria de A, -Delta la de B, y un margen tau calibrado determina el empate.\n\n"
          "Esta formulación matemática garantiza una invariancia posicional perfecta: si intercambiamos las respuestas, la probabilidad se invierte de forma exacta, logrando un Swap Bias de 0.000000 absoluto.\n\n"
-         "A nivel experimental, evaluamos la formulación siamés en nuestra GPU local de 8GB, alcanzando un Log Loss en Test de 1.0886 y superando la línea base trivial. Esta experiencia nos deja una valiosa lección de ingeniería: mientras que modelos de literatura entrenados durante 30 horas en clusters A100 alcanzan 0.998, en entornos con restricciones de hardware un Transformer sin fine-tuning de todas sus capas atencionales no logra batir a un modelo tabular optimizado como XGBoost.»"),
+         "El pipeline histórico no hacía fine-tuning, así que sus métricas no son presentables. El nuevo ejecutor sí ajusta el codificador y guarda checkpoint, historial y predicciones; la métrica final se reportará únicamente después de ejecutar full-run.»"),
 
         ("Slide 13 (Comparativa E2E de los 4 Modelos del Proyecto):",
          "«En esta tabla podemos contrastar el trabajo de los cuatro integrantes frente a la línea base trivial:\n"

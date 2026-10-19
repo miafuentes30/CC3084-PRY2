@@ -112,4 +112,24 @@ streamlit run app/streamlit_app.py
 
 Pestañas: resumen, exploración de los datos, resultados de los 4 modelos (se pueden ocultar) y clasificación de un caso nuevo.
 Requiere `data/processed/train_clean.csv` (notebook 02) y `data/splits.csv`. La clasificación en vivo está disponible para
-regresión logística y XGBoost; embeddings y DeBERTa muestran sus resultados, pero sus artefactos viven en Drive.
+regresión logística y XGBoost. Los artefactos de embeddings y DeBERTa deben generarse localmente
+antes de presentarlos; la app no los muestra como disponibles mientras falte su checkpoint reproducible.
+
+### Fine-tuning real de DeBERTa
+
+La corrida corta sirve únicamente para comprobar el pipeline y habilitar una demo local:
+
+```bash
+python -m src.run_deberta --epochs 1 --max-train-rows 512 --max-val-rows 256 --max-test-rows 256
+```
+
+Para obtener las métricas que sí deben aparecer en el informe y en la comparación de la app,
+ejecutar sin límites de filas (preferiblemente con una instalación de PyTorch compatible con la GPU):
+
+```bash
+python -m src.run_deberta --epochs 2 --batch-size 4 --max-length 384
+```
+
+El script guarda el historial real en `results/metrics/deberta.json`, predicciones en
+`results/preds/deberta_*.csv` y el checkpoint en `models/deberta_checkpoint/`. Una corrida
+limitada nunca se incluye como resultado final.

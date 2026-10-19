@@ -20,7 +20,7 @@ MODEL_DIR = ROOT / "models"
 # Modelos cuyo artefacto pesado vive en Drive y no está en el repositorio.
 UNAVAILABLE = {
     "embeddings": "No se versiona el clasificador entrenado ni los embeddings (se calculan con GPU).",
-    "deberta": "El checkpoint del Transformer se comparte por Google Drive, no está en el repositorio.",
+    "deberta": "Ejecuta `python -m src.run_deberta` para generar models/deberta_checkpoint.",
 }
 
 
@@ -34,6 +34,20 @@ def load_models() -> dict:
     p = MODEL_DIR / "xgboost_bundle.joblib"
     if p.exists():
         out["xgboost"] = joblib.load(p)
+    checkpoint = MODEL_DIR / "deberta_checkpoint"
+    if (checkpoint / "head.pt").exists():
+        from transformers import AutoModel, AutoTokenizer
+        import torch
+
+        head = torch.load(checkpoint / "head.pt", map_location="cpu", weights_only=True)
+        encoder = AutoModel.from_pretrained(checkpoint).float()
+        model = {"tokenizer": AutoTokenizer.from_pretrained(checkpoint), "encoder": encoder}
+        model["reward"] = torch.nn.Linear(encoder.config.hidden_size, 1)
+        model["reward"].load_state_dict(head["reward"])
+        model["log_tau"] = head["log_tau"]
+        model["encoder"].eval()
+        model["reward"].eval()
+        out["deberta"] = model
     return out
 
 
@@ -48,6 +62,24 @@ def predict_all(prompt: str, resp_a: str, resp_b: str, model_a: str, model_b: st
         b = models["xgboost"]
         x = b["builder"].transform(row)[b["columns"]]
         out["xgboost"] = b["clf"].predict_proba(x)[0]
+    if "deberta" in models:
+        import torch
+
+        b = models["deberta"]
+        tokenizer = b["tokenizer"]
+        encoded = []
+        for response in (resp_a, resp_b):
+            encoded.append(tokenizer(prompt, response, max_length=384, truncation=True,
+                                     padding="max_length", return_tensors="pt"))
+        with torch.no_grad():
+            scores = []
+            for item in encoded:
+                hidden = b["encoder"](**item).last_hidden_state[:, 0]
+                scores.append(b["reward"](hidden).squeeze(-1))
+            delta = scores[0] - scores[1]
+            tau = torch.exp(b["log_tau"])
+            logits = torch.stack((delta, -delta, tau - torch.abs(delta)), dim=1)
+            out["deberta"] = torch.softmax(logits, dim=1)[0].numpy()
     return out
 
 

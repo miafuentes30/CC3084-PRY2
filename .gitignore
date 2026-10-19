@@ -227,6 +227,7 @@ data/processed/*
 
 # Pipelines entrenados: se regeneran con el notebook 06 y no se versionan.
 models/*.joblib
+models/deberta_checkpoint/
 
 # Pesos de modelos, checkpoints y embeddings (no se versionan en Git)
 *.npy

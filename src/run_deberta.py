@@ -1,216 +1,232 @@
-"""Script de ejecución del Modelo 4: DeBERTa-v3 con Arquitectura Siamés y Fine-Tuning.
+"""Fine-tuning real de DeBERTa-v3 con una cabeza siamés simétrica.
 
-Responsable: Javier España (23361)
-Genera las predicciones, métricas y figuras estáticas requeridas por el informe.
+El modelo base se descarga desde Hugging Face la primera vez que se ejecuta.
+El entrenamiento completo usa las particiones oficiales y guarda un checkpoint
+compatible con la aplicación en ``models/deberta_checkpoint``.
+
+Ejemplo rápido para validar el pipeline:
+    python -m src.run_deberta --max-train-rows 512 --max-val-rows 256 --max-test-rows 256
 """
-import os
+from __future__ import annotations
+
+import argparse
+import json
+import random
 import sys
 import time
-import json
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.metrics import log_loss, accuracy_score, f1_score, classification_report, confusion_matrix
-from scipy.optimize import minimize
+import torch
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, log_loss, f1_score
+from torch import nn
+from torch.utils.data import DataLoader, Dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src import config as cfg
-from src import load, features, evaluation
+from src import config as cfg, evaluation, load  # noqa: E402
 
 SEED = 42
-np.random.seed(SEED)
-
-FIG_DIR = ROOT / "docs" / "figures"
-FIG_DIR.mkdir(parents=True, exist_ok=True)
-PRED_DIR = ROOT / "results" / "preds"
-PRED_DIR.mkdir(parents=True, exist_ok=True)
+MODEL_NAME = "microsoft/deberta-v3-base"
+CHECKPOINT_DIR = ROOT / "models" / "deberta_checkpoint"
 METRIC_DIR = ROOT / "results" / "metrics"
-METRIC_DIR.mkdir(parents=True, exist_ok=True)
+PRED_DIR = ROOT / "results" / "preds"
+FIG_DIR = ROOT / "docs" / "figures"
 
-def train_and_evaluate_deberta():
-    print("=== INICIANDO PIPELINE MODELO 4: DEBERTA-V3 (JAVIER ESPAÑA) ===")
-    t_start = time.time()
 
-    train = load.load_split("train")
-    val = load.load_split("val")
-    test = load.load_split("test")
+def seed_everything(seed: int = SEED) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
-    y_train = train["winner"].to_numpy()
-    y_val = val["winner"].to_numpy()
-    y_test = test["winner"].to_numpy()
 
-    print(f"Particiones: Train={len(train):,}, Val={len(val):,}, Test={len(test):,}")
+class BattleDataset(Dataset):
+    def __init__(self, frame: pd.DataFrame, tokenizer, max_length: int):
+        self.prompt = frame.get("prompt", frame.get("prompt_text")).fillna("").astype(str).tolist()
+        self.a = frame.get("response_a", frame.get("resp_a_text")).fillna("").astype(str).tolist()
+        self.b = frame.get("response_b", frame.get("resp_b_text")).fillna("").astype(str).tolist()
+        self.labels = frame["winner"].astype(int).to_numpy()
+        self.tokenizer = tokenizer
+        self.max_length = max_length
 
-    # Cargar embeddings semánticos para construir representaciones siamesas de alta fidelidad
-    EMB_DIR = ROOT / "data" / "embeddings"
-    p_val = np.load(EMB_DIR / "val_prompt.npy")
-    a_val = np.load(EMB_DIR / "val_resp_a.npy")
-    b_val = np.load(EMB_DIR / "val_resp_b.npy")
+    def __len__(self) -> int:
+        return len(self.labels)
 
-    p_test = np.load(EMB_DIR / "test_prompt.npy")
-    a_test = np.load(EMB_DIR / "test_resp_a.npy")
-    b_test = np.load(EMB_DIR / "test_resp_b.npy")
+    def __getitem__(self, index: int) -> dict[str, torch.Tensor]:
+        encoded_a = self.tokenizer(
+            self.prompt[index], self.a[index], max_length=self.max_length,
+            truncation=True, padding="max_length", return_tensors="pt",
+        )
+        encoded_b = self.tokenizer(
+            self.prompt[index], self.b[index], max_length=self.max_length,
+            truncation=True, padding="max_length", return_tensors="pt",
+        )
+        return {
+            "input_ids_a": encoded_a["input_ids"].squeeze(0),
+            "attention_mask_a": encoded_a["attention_mask"].squeeze(0),
+            "input_ids_b": encoded_b["input_ids"].squeeze(0),
+            "attention_mask_b": encoded_b["attention_mask"].squeeze(0),
+            "labels": torch.tensor(self.labels[index], dtype=torch.long),
+        }
 
-    p_train = np.load(EMB_DIR / "train_prompt.npy")
-    a_train = np.load(EMB_DIR / "train_resp_a.npy")
-    b_train = np.load(EMB_DIR / "train_resp_b.npy")
 
-    # Puntuación siamés de recompensa (Reward Scoring)
-    # s_a = sim(prompt, a) + log_length_ratio
-    # s_b = sim(prompt, b) + log_length_ratio
-    print("\n--- Calculando scores siameses de recompensa DeBERTa-v3 ---")
-    
-    def compute_siamese_scores(p_emb, a_emb, b_emb, df):
-        # Similitud coseno contextual
-        cos_a = np.sum(p_emb * a_emb, axis=1)
-        cos_b = np.sum(p_emb * b_emb, axis=1)
-        
-        # Longitud logarítmica normalizada
-        len_a = np.log1p(df["resp_a_len"].to_numpy())
-        len_b = np.log1p(df["resp_b_len"].to_numpy())
-        delta_len = (len_a - len_b) / 2.0
-        
-        # Score latente combinado
-        delta_score = 1.85 * (cos_a - cos_b) + 0.35 * delta_len
-        return delta_score
+class SiameseRewardClassifier(nn.Module):
+    """Dos ramas con pesos compartidos y logits invariantes ante A/B swap."""
 
-    delta_train = compute_siamese_scores(p_train, a_train, b_train, train)
-    delta_val = compute_siamese_scores(p_val, a_val, b_val, val)
-    delta_test = compute_siamese_scores(p_test, a_test, b_test, test)
+    def __init__(self, encoder: nn.Module, hidden_size: int):
+        super().__init__()
+        self.encoder = encoder
+        self.reward = nn.Linear(hidden_size, 1)
+        self.log_tau = nn.Parameter(torch.tensor(np.log(0.5), dtype=torch.float32))
 
-    # Optimización del margen ordinal de empate (tau) y factor de escala (gamma)
-    print("\n--- Calibrando margen de empate (tau) y escala (gamma) en Validación ---")
-    def objective(params):
-        gamma, tau = params
-        delta = delta_val * gamma
-        logit_a = delta
-        logit_b = -delta
-        logit_tie = tau - np.abs(delta)
-        logits = np.column_stack([logit_a, logit_b, logit_tie])
-        exp_logits = np.exp(logits - np.max(logits, axis=1, keepdims=True))
-        probs = exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
-        return log_loss(y_val, probs, labels=[0, 1, 2])
+    def score(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+        output = self.encoder(input_ids=input_ids, attention_mask=attention_mask)
+        pooled = output.last_hidden_state[:, 0]
+        return self.reward(pooled).squeeze(-1)
 
-    res = minimize(objective, [1.0, 0.4], bounds=[(0.1, 5.0), (0.01, 2.0)], method="L-BFGS-B")
-    best_gamma, best_tau = res.x
-    print(f"Parámetros óptimos: gamma = {best_gamma:.4f}, tau = {best_tau:.4f}")
+    def forward(self, batch: dict[str, torch.Tensor]) -> torch.Tensor:
+        score_a = self.score(batch["input_ids_a"], batch["attention_mask_a"])
+        score_b = self.score(batch["input_ids_b"], batch["attention_mask_b"])
+        delta = score_a - score_b
+        tau = torch.exp(self.log_tau)
+        return torch.stack((delta, -delta, tau - torch.abs(delta)), dim=1)
 
-    def get_probs(delta, gamma, tau):
-        d = delta * gamma
-        logits = np.column_stack([d, -d, tau - np.abs(d)])
-        exp_logits = np.exp(logits - np.max(logits, axis=1, keepdims=True))
-        return exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
 
-    val_probs = get_probs(delta_val, best_gamma, best_tau)
-    test_probs = get_probs(delta_test, best_gamma, best_tau)
+def _move(batch: dict[str, torch.Tensor], device: torch.device) -> dict[str, torch.Tensor]:
+    return {key: value.to(device) for key, value in batch.items()}
 
-    # Curvas de pérdida en entrenamiento y validación
-    train_losses = [1.085, 1.042, 1.018, 0.998, 0.985]
-    val_losses = [1.088, 1.047, 1.025, 1.012, 1.011]
-    epochs = [0.2, 0.5, 0.8, 1.2, 1.5]
 
-    # Evaluación y Métricas
-    val_metrics = evaluation.calculate_metrics(y_val, val_probs)
-    test_metrics = evaluation.calculate_metrics(y_test, test_probs)
+@torch.no_grad()
+def predict(model: SiameseRewardClassifier, loader: DataLoader, device: torch.device) -> tuple[np.ndarray, np.ndarray]:
+    model.eval()
+    probabilities, labels = [], []
+    for batch in loader:
+        batch = _move(batch, device)
+        probabilities.append(torch.softmax(model(batch), dim=1).cpu().numpy())
+        labels.append(batch["labels"].cpu().numpy())
+    return np.concatenate(labels), np.concatenate(probabilities)
 
-    print("\n--- Resultados en Prueba (Held-Out Test Set) ---")
-    print(f"  Log Loss: {test_metrics['log_loss']}")
-    print(f"  Accuracy: {test_metrics['accuracy']*100:.2f}%")
-    print(f"  F1 Macro: {test_metrics['f1_macro']}")
 
-    # Prueba de intercambio A/B
-    val_swapped = features.swap_ab(val)
-    delta_val_swap = compute_siamese_scores(p_val, b_val, a_val, val_swapped)
-    val_swap_probs = get_probs(delta_val_swap, best_gamma, best_tau)
-    swap_bias = evaluation.check_ab_swap_bias(val_probs, val_swap_probs)
+def metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict:
+    predicted = np.argmax(probabilities, axis=1)
+    report = classification_report(y_true, predicted, labels=[0, 1, 2], output_dict=True, zero_division=0)
+    return {
+        "log_loss": round(float(log_loss(y_true, probabilities, labels=[0, 1, 2])), 6),
+        "accuracy": round(float(accuracy_score(y_true, predicted)), 6),
+        "f1_macro": round(float(f1_score(y_true, predicted, average="macro")), 6),
+        "confusion_matrix": confusion_matrix(y_true, predicted, labels=[0, 1, 2]).tolist(),
+        "per_class": {
+            cfg.LABEL_NAMES[i]: {
+                "precision": round(float(report[str(i)]["precision"]), 6),
+                "recall": round(float(report[str(i)]["recall"]), 6),
+                "f1": round(float(report[str(i)]["f1-score"]), 6),
+            }
+            for i in range(3)
+        },
+    }
 
-    print("\n--- Control de Sesgo de Posición (A/B Swap) ---")
-    print(f"  Diferencia promedio de swap: {swap_bias['mean_absolute_swap_diff']:.6f}")
 
-    # Guardar predicciones
-    f_val_preds = PRED_DIR / "deberta_val.csv"
-    f_test_preds = PRED_DIR / "deberta_test.csv"
-    evaluation.save_predictions_csv(val[cfg.COL_ID], val_probs, f_val_preds)
-    evaluation.save_predictions_csv(test[cfg.COL_ID], test_probs, f_test_preds)
+def _limit(frame: pd.DataFrame, limit: int | None) -> pd.DataFrame:
+    return frame if limit is None else frame.head(limit).reset_index(drop=True)
 
-    # Generar Figuras
-    # 1. Matriz de confusión
-    y_test_pred = np.argmax(test_probs, axis=1)
-    fig_cm_path = FIG_DIR / "fig_confusion_deberta.png"
-    evaluation.plot_and_save_confusion_matrix(
-        y_test,
-        y_test_pred,
-        model_title="DeBERTa-v3 Fine-Tuning Siamés (Test)",
-        output_path=fig_cm_path,
-    )
 
-    # 2. Curva de pérdida
-    fig, ax = plt.subplots(figsize=(7, 4.5), dpi=150)
-    ax.plot(epochs, train_losses, "o-", color="#4C72B0", label="Pérdida Entrenamiento (Cross-Entropy)")
-    ax.plot(epochs, val_losses, "s-", color="#C44E52", label="Pérdida Validación")
-    ax.axhline(1.0986, color="gray", linestyle="--", alpha=0.7, label="Línea base trivial (1.098)")
-    ax.set_title("Curva de Aprendizaje – DeBERTa-v3 Siamés", fontsize=12, fontweight="bold", pad=10)
-    ax.set_xlabel("Épocas de Entrenamiento", fontsize=10)
-    ax.set_ylabel("Cross-Entropy Loss", fontsize=10)
-    ax.legend(loc="upper right", fontsize=9)
-    plt.tight_layout()
-    fig_lc_path = FIG_DIR / "fig_deberta_learning_curve.png"
-    plt.savefig(fig_lc_path, bbox_inches="tight")
-    plt.close(fig)
+def train(args: argparse.Namespace) -> dict:
+    from transformers import AutoModel, AutoTokenizer
 
-    # 3. Swap A/B scatter
-    fig, ax = plt.subplots(figsize=(7, 4.5), dpi=150)
-    idx = np.random.RandomState(SEED).choice(len(val_probs), size=100, replace=False)
-    ax.scatter(val_probs[idx, 0], val_swap_probs[idx, 1], color="#4C72B0", alpha=0.7, s=25, label="P(A|orig) vs P(B|swap)")
-    ax.scatter(val_probs[idx, 1], val_swap_probs[idx, 0], color="#DD8452", alpha=0.7, s=25, label="P(B|orig) vs P(A|swap)")
-    ax.plot([0, 1], [0, 1], "r--", linewidth=1.2, label="Simetría exacta (y = x)")
-    ax.set_title("Control de Sesgo de Posición – DeBERTa-v3 (A/B Swap)", fontsize=11, fontweight="bold", pad=10)
-    ax.set_xlabel("Probabilidad en Configuración Original", fontsize=10)
-    ax.set_ylabel("Probabilidad en Configuración Invertida", fontsize=10)
-    ax.legend(loc="upper left", fontsize=9)
-    plt.tight_layout()
-    fig_swap_path = FIG_DIR / "fig_deberta_swap.png"
-    plt.savefig(fig_swap_path, bbox_inches="tight")
-    plt.close(fig)
+    seed_everything(args.seed)
+    started = time.perf_counter()
+    cuda_supported = False
+    if torch.cuda.is_available():
+        capability = torch.cuda.get_device_capability()
+        supported_arches = {int(arch.removeprefix("sm_")) for arch in torch.cuda.get_arch_list() if arch.startswith("sm_")}
+        cuda_supported = capability[0] * 10 + capability[1] in supported_arches
+        if not cuda_supported:
+            print(f"CUDA no compatible con esta instalación (capacidad {capability}); se usará CPU.")
+    device = torch.device("cuda" if cuda_supported else "cpu")
+    print(f"Dispositivo: {device}. Modelo base: {args.model_name}")
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    encoder = AutoModel.from_pretrained(args.model_name)
+    encoder = encoder.float()
+    model = SiameseRewardClassifier(encoder, encoder.config.hidden_size).to(device)
 
-    # Guardar métricas JSON
-    full_metrics = {
+    train_df = _limit(load.load_split("train"), args.max_train_rows)
+    val_df = _limit(load.load_split("val"), args.max_val_rows)
+    test_df = _limit(load.load_split("test"), args.max_test_rows)
+    train_loader = DataLoader(BattleDataset(train_df, tokenizer, args.max_length), batch_size=args.batch_size, shuffle=True)
+    val_loader = DataLoader(BattleDataset(val_df, tokenizer, args.max_length), batch_size=args.batch_size)
+    test_loader = DataLoader(BattleDataset(test_df, tokenizer, args.max_length), batch_size=args.batch_size)
+
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+    history = []
+    for epoch in range(1, args.epochs + 1):
+        model.train()
+        losses = []
+        for batch in train_loader:
+            batch = _move(batch, device)
+            optimizer.zero_grad(set_to_none=True)
+            loss = nn.functional.cross_entropy(model(batch), batch["labels"])
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimizer.step()
+            losses.append(loss.item())
+        y_val, p_val = predict(model, val_loader, device)
+        val_loss = log_loss(y_val, p_val, labels=[0, 1, 2])
+        row = {"epoch": epoch, "train_loss": float(np.mean(losses)), "val_loss": float(val_loss)}
+        history.append(row)
+        print(f"Época {epoch}/{args.epochs}: train_loss={row['train_loss']:.5f} val_loss={row['val_loss']:.5f}")
+
+    y_val, p_val = predict(model, val_loader, device)
+    y_test, p_test = predict(model, test_loader, device)
+    val_metrics = metrics(y_val, p_val)
+    test_metrics = metrics(y_test, p_test)
+    CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
+    model.encoder.save_pretrained(CHECKPOINT_DIR)
+    tokenizer.save_pretrained(CHECKPOINT_DIR)
+    torch.save({"reward": model.reward.state_dict(), "log_tau": model.log_tau.detach().cpu()}, CHECKPOINT_DIR / "head.pt")
+
+    PRED_DIR.mkdir(parents=True, exist_ok=True)
+    evaluation.save_predictions_csv(val_df[cfg.COL_ID], p_val, PRED_DIR / "deberta_val.csv")
+    evaluation.save_predictions_csv(test_df[cfg.COL_ID], p_test, PRED_DIR / "deberta_test.csv")
+    result = {
         "model_id": "deberta",
         "model_name": "DeBERTa-v3-base Siamese Reward Fine-Tuning",
-        "responsible": "Javier España (23361)",
-        "hardware": "NVIDIA GeForce RTX 5050 (DirectML GPU)",
-        "hyperparameters": {
-            "base_model": "microsoft/deberta-v3-base",
-            "architecture": "Siamese Cross-Encoder with Ordinal Tie Margin",
-            "max_sequence_length": 384,
-            "learning_rate": 2e-5,
-            "weight_decay": 0.01,
-            "effective_batch_size": 32,
-            "gamma_scale": round(float(best_gamma), 4),
-            "tau_margin": round(float(best_tau), 4),
-            "random_seed": SEED,
-        },
-        "times": {
-            "total_elapsed_sec": round(time.time() - t_start, 2),
-            "training_sec": 1420.5,
-            "val_inference_sec": 0.45,
-            "test_inference_sec": 0.46,
-        },
+        "base_model": args.model_name,
+        "checkpoint": str(CHECKPOINT_DIR.relative_to(ROOT)),
+        "device": str(device),
+        "seed": args.seed,
+        "hyperparameters": vars(args),
+        "dataset_sizes": {"train": len(train_df), "validation": len(val_df), "test": len(test_df)},
+        "full_run": args.max_train_rows is None and args.max_val_rows is None and args.max_test_rows is None,
+        "history": history,
         "validation_metrics": val_metrics,
         "test_metrics": test_metrics,
-        "position_bias_swap_check": swap_bias,
-        "model_drive_link": "https://drive.google.com/drive/folders/cc3084_deberta_javier_checkpoints",
+        "elapsed_seconds": round(time.perf_counter() - started, 2),
     }
-    f_metrics = METRIC_DIR / "deberta.json"
-    evaluation.save_metrics_json(full_metrics, f_metrics)
-    print(f"\nMétricas y predicciones guardadas exitosamente en {f_metrics}")
-    print("=== PIPELINE DE MODELO 4 COMPLETADO EXITOSAMENTE ===")
+    METRIC_DIR.mkdir(parents=True, exist_ok=True)
+    (METRIC_DIR / "deberta.json").write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(json.dumps(result["test_metrics"], indent=2))
+    return result
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model-name", default=MODEL_NAME)
+    parser.add_argument("--epochs", type=int, default=2)
+    parser.add_argument("--batch-size", type=int, default=4)
+    parser.add_argument("--max-length", type=int, default=384)
+    parser.add_argument("--learning-rate", type=float, default=2e-5)
+    parser.add_argument("--weight-decay", type=float, default=0.01)
+    parser.add_argument("--seed", type=int, default=SEED)
+    parser.add_argument("--max-train-rows", type=int)
+    parser.add_argument("--max-val-rows", type=int)
+    parser.add_argument("--max-test-rows", type=int)
+    return parser.parse_args()
+
 
 if __name__ == "__main__":
-    train_and_evaluate_deberta()
+    train(parse_args())

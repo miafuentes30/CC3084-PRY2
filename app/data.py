@@ -40,7 +40,21 @@ def load_clean() -> pd.DataFrame | None:
 
 @st.cache_data
 def available_models() -> list[str]:
-    return [m for m in MODEL_IDS if (RESULTS / "preds" / f"{m}_test.csv").exists()]
+    available = []
+    for model in MODEL_IDS:
+        if not (RESULTS / "preds" / f"{model}_test.csv").exists():
+            continue
+        if model == "deberta":
+            metric_file = RESULTS / "metrics" / "deberta.json"
+            checkpoint = ROOT / "models" / "deberta_checkpoint" / "head.pt"
+            try:
+                metadata = json.loads(metric_file.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if not checkpoint.exists() or "history" not in metadata or not metadata.get("full_run", False):
+                continue
+        available.append(model)
+    return available
 
 
 @st.cache_data
