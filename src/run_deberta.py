@@ -14,6 +14,7 @@ import json
 import random
 import sys
 import time
+import importlib.metadata
 from pathlib import Path
 
 import numpy as np
@@ -131,6 +132,45 @@ def metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict:
     }
 
 
+def swap_responses(frame: pd.DataFrame) -> pd.DataFrame:
+    """Return a copy with response A and B exchanged."""
+    swapped = frame.copy()
+    response_a = "response_a" if "response_a" in swapped else "resp_a_text"
+    response_b = "response_b" if "response_b" in swapped else "resp_b_text"
+    swapped[response_a], swapped[response_b] = (
+        frame[response_b].to_numpy(),
+        frame[response_a].to_numpy(),
+    )
+    return swapped
+
+
+def predict_frame(
+    model: SiameseRewardClassifier,
+    frame: pd.DataFrame,
+    tokenizer,
+    max_length: int,
+    batch_size: int,
+    device: torch.device,
+) -> np.ndarray:
+    """Predict probabilities for a frame, including frames without labels."""
+    dataset = BattleDataset(frame.assign(winner=0), tokenizer, max_length)
+    loader = DataLoader(dataset, batch_size=batch_size)
+    model.eval()
+    probabilities = []
+    with torch.no_grad():
+        for batch in loader:
+            batch = _move(batch, device)
+            probabilities.append(torch.softmax(model(batch), dim=1).cpu().numpy())
+    return np.concatenate(probabilities)
+
+
+def _package_version(name: str) -> str | None:
+    try:
+        return importlib.metadata.version(name)
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+
 def _limit(frame: pd.DataFrame, limit: int | None) -> pd.DataFrame:
     return frame if limit is None else frame.head(limit).reset_index(drop=True)
 
@@ -146,7 +186,12 @@ def train(args: argparse.Namespace) -> dict:
         supported_arches = {int(arch.removeprefix("sm_")) for arch in torch.cuda.get_arch_list() if arch.startswith("sm_")}
         cuda_supported = capability[0] * 10 + capability[1] in supported_arches
         if not cuda_supported:
-            print(f"CUDA no compatible con esta instalación (capacidad {capability}); se usará CPU.")
+            message = f"CUDA no compatible con esta instalación (capacidad {capability})."
+            if args.require_cuda:
+                raise RuntimeError(message)
+            print(f"{message} Se usará CPU.")
+    elif args.require_cuda:
+        raise RuntimeError("CUDA es obligatorio para esta ejecución, pero no está disponible.")
     device = torch.device("cuda" if cuda_supported else "cpu")
     print(f"Dispositivo: {device}. Modelo base: {args.model_name}")
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
@@ -184,6 +229,15 @@ def train(args: argparse.Namespace) -> dict:
     y_test, p_test = predict(model, test_loader, device)
     val_metrics = metrics(y_val, p_val)
     test_metrics = metrics(y_test, p_test)
+    swap_probs = predict_frame(
+        model,
+        swap_responses(val_df),
+        tokenizer,
+        args.max_length,
+        args.batch_size,
+        device,
+    )
+    swap_check = evaluation.check_ab_swap_bias(p_val, swap_probs)
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
     model.encoder.save_pretrained(CHECKPOINT_DIR)
     tokenizer.save_pretrained(CHECKPOINT_DIR)
@@ -192,19 +246,38 @@ def train(args: argparse.Namespace) -> dict:
     PRED_DIR.mkdir(parents=True, exist_ok=True)
     evaluation.save_predictions_csv(val_df[cfg.COL_ID], p_val, PRED_DIR / "deberta_val.csv")
     evaluation.save_predictions_csv(test_df[cfg.COL_ID], p_test, PRED_DIR / "deberta_test.csv")
+    official_sizes = load.load_splits()["split"].value_counts().to_dict()
+    dataset_sizes = {"train": len(train_df), "validation": len(val_df), "test": len(test_df)}
+    full_run = (
+        args.max_train_rows is None
+        and args.max_val_rows is None
+        and args.max_test_rows is None
+        and dataset_sizes == {
+            "train": int(official_sizes.get("train", -1)),
+            "validation": int(official_sizes.get("val", -1)),
+            "test": int(official_sizes.get("test", -1)),
+        }
+    )
     result = {
         "model_id": "deberta",
         "model_name": "DeBERTa-v3-base Siamese Reward Fine-Tuning",
         "base_model": args.model_name,
         "checkpoint": str(CHECKPOINT_DIR.relative_to(ROOT)),
         "device": str(device),
+        "python_version": sys.version.split()[0],
+        "torch_version": torch.__version__,
+        "torch_cuda_version": torch.version.cuda,
+        "gpu_name": torch.cuda.get_device_name(0) if device.type == "cuda" else None,
+        "gpu_capability": list(torch.cuda.get_device_capability(0)) if device.type == "cuda" else None,
+        "transformers_version": _package_version("transformers"),
         "seed": args.seed,
         "hyperparameters": vars(args),
-        "dataset_sizes": {"train": len(train_df), "validation": len(val_df), "test": len(test_df)},
-        "full_run": args.max_train_rows is None and args.max_val_rows is None and args.max_test_rows is None,
+        "dataset_sizes": dataset_sizes,
+        "full_run": full_run,
         "history": history,
         "validation_metrics": val_metrics,
         "test_metrics": test_metrics,
+        "position_bias_swap_check": swap_check,
         "elapsed_seconds": round(time.perf_counter() - started, 2),
     }
     METRIC_DIR.mkdir(parents=True, exist_ok=True)
@@ -225,6 +298,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-train-rows", type=int)
     parser.add_argument("--max-val-rows", type=int)
     parser.add_argument("--max-test-rows", type=int)
+    parser.add_argument(
+        "--require-cuda",
+        action="store_true",
+        help="Falla en lugar de usar CPU si CUDA no está disponible o no es compatible.",
+    )
     return parser.parse_args()
 
 

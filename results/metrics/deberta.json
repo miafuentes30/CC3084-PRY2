@@ -2,53 +2,63 @@
   "model_id": "deberta",
   "model_name": "DeBERTa-v3-base Siamese Reward Fine-Tuning",
   "base_model": "microsoft/deberta-v3-base",
-  "checkpoint": "models\\deberta_checkpoint",
-  "device": "cpu",
+  "checkpoint": "models/deberta_checkpoint",
+  "device": "cuda",
+  "python_version": "3.14.4",
+  "torch_version": "2.14.1+cu130",
+  "torch_cuda_version": "13.0",
+  "gpu_name": "NVIDIA GeForce RTX 5050",
+  "gpu_capability": [
+    12,
+    0
+  ],
+  "transformers_version": "5.20.2",
   "seed": 42,
   "hyperparameters": {
     "model_name": "microsoft/deberta-v3-base",
     "epochs": 1,
     "batch_size": 2,
-    "max_length": 64,
+    "max_length": 128,
     "learning_rate": 2e-05,
     "weight_decay": 0.01,
     "seed": 42,
-    "max_train_rows": 16,
-    "max_val_rows": 8,
-    "max_test_rows": 8
+    "max_train_rows": 64,
+    "max_val_rows": 32,
+    "max_test_rows": 32,
+    "require_cuda": true
   },
   "dataset_sizes": {
-    "train": 16,
-    "validation": 8,
-    "test": 8
+    "train": 64,
+    "validation": 32,
+    "test": 32
   },
   "full_run": false,
   "history": [
     {
       "epoch": 1,
-      "train_loss": 1.138277530670166,
-      "val_loss": 1.1680569648742676
+      "train_loss": 1.0831676442176104,
+      "val_loss": 1.2020072937011719
     }
   ],
   "validation_metrics": {
-    "log_loss": 1.168057,
-    "accuracy": 0.25,
-    "f1_macro": 0.133333,
+    "log_loss": 1.202007,
+    "accuracy": 0.15625,
+    "f1_macro": 0.09009,
     "confusion_matrix": [
       [
         0,
         0,
-        2
+        12
       ],
       [
         0,
         0,
-        4
+        15
       ],
       [
         0,
         0,
-        2
+        5
       ]
     ],
     "per_class": {
@@ -63,31 +73,31 @@
         "f1": 0.0
       },
       "empate": {
-        "precision": 0.25,
+        "precision": 0.15625,
         "recall": 1.0,
-        "f1": 0.4
+        "f1": 0.27027
       }
     }
   },
   "test_metrics": {
-    "log_loss": 1.106128,
-    "accuracy": 0.375,
-    "f1_macro": 0.181818,
+    "log_loss": 1.129131,
+    "accuracy": 0.3125,
+    "f1_macro": 0.15873,
     "confusion_matrix": [
       [
         0,
         0,
-        4
+        12
       ],
       [
         0,
         0,
-        1
+        10
       ],
       [
         0,
         0,
-        3
+        10
       ]
     ],
     "per_class": {
@@ -102,11 +112,17 @@
         "f1": 0.0
       },
       "empate": {
-        "precision": 0.375,
+        "precision": 0.3125,
         "recall": 1.0,
-        "f1": 0.545455
+        "f1": 0.47619
       }
     }
   },
-  "elapsed_seconds": 27.55
+  "position_bias_swap_check": {
+    "mean_absolute_swap_diff": 0.0,
+    "p_a_to_p_b_diff": 0.0,
+    "p_b_to_p_a_diff": 0.0,
+    "p_tie_invariance_diff": 0.0
+  },
+  "elapsed_seconds": 37.24
 }
