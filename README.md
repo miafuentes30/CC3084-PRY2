@@ -70,3 +70,24 @@ train = load.load_train(nrows=5_000)
 # Dataset limpio (generado por notebook 02)
 clean = load.load_train_clean()
 ```
+
+## Regresión logística multinomial (Fase 2)
+
+La contribución de regresión logística compara dos variantes reproducibles:
+
+- Variante A: longitudes, palabras, diferencias, transformaciones logarítmicas y turnos.
+- Variante B: las variables anteriores más `model_a` y `model_b` codificados con *one-hot*.
+
+Primero debe existir `data/processed/train_clean.csv`, generado por el notebook 02. Las
+particiones de `data/splits.csv` se cargan sin regenerarlas. Para reproducir entrenamiento,
+evaluación, predicciones y figuras:
+
+```bash
+python -m src.logreg_model --run --cv-folds 5 --max-iter 1000
+python -m pytest tests/test_logreg.py -q
+```
+
+El análisis ejecutado se encuentra en
+`notebooks/06_modelo_regresion_logistica.ipynb` y la redacción para el informe en
+`docs/modelo_regresion_logistica.md`. Los CSV y métricas se guardan bajo `results/`.
+El pipeline `models/logreg_pipeline.joblib` se genera localmente y está excluido de Git.
