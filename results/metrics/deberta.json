@@ -1,0 +1,86 @@
+{
+  "model_id": "deberta",
+  "model_name": "DeBERTa-v3-base Siamese Reward Fine-Tuning",
+  "responsible": "Javier España (23361)",
+  "hardware": "NVIDIA GeForce RTX 5050 (DirectML GPU)",
+  "hyperparameters": {
+    "base_model": "microsoft/deberta-v3-base",
+    "architecture": "Siamese Cross-Encoder with Ordinal Tie Margin",
+    "max_sequence_length": 384,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "effective_batch_size": 32,
+    "gamma_scale": 0.3319,
+    "tau_margin": 0.01,
+    "random_seed": 42
+  },
+  "times": {
+    "total_elapsed_sec": 7.14,
+    "training_sec": 1420.5,
+    "val_inference_sec": 0.45,
+    "test_inference_sec": 0.46
+  },
+  "validation_metrics": {
+    "log_loss": 1.09033,
+    "accuracy": 0.39684,
+    "f1_macro": 0.35293,
+    "baseline_comparison": {
+      "trivial_log_loss": 1.09717,
+      "trivial_accuracy": 0.34947,
+      "log_loss_improvement": 0.00683,
+      "accuracy_improvement": 0.04737
+    },
+    "per_class": {
+      "model_a": {
+        "precision": 0.4003,
+        "recall": 0.5272,
+        "f1": 0.4551
+      },
+      "model_b": {
+        "precision": 0.3962,
+        "recall": 0.5394,
+        "f1": 0.4568
+      },
+      "tie": {
+        "precision": 0.3799,
+        "recall": 0.0911,
+        "f1": 0.1469
+      }
+    }
+  },
+  "test_metrics": {
+    "log_loss": 1.08856,
+    "accuracy": 0.39963,
+    "f1_macro": 0.35511,
+    "baseline_comparison": {
+      "trivial_log_loss": 1.09717,
+      "trivial_accuracy": 0.34936,
+      "log_loss_improvement": 0.00861,
+      "accuracy_improvement": 0.05027
+    },
+    "per_class": {
+      "model_a": {
+        "precision": 0.4079,
+        "recall": 0.5434,
+        "f1": 0.466
+      },
+      "model_b": {
+        "precision": 0.3932,
+        "recall": 0.531,
+        "f1": 0.4519
+      },
+      "tie": {
+        "precision": 0.3872,
+        "recall": 0.0911,
+        "f1": 0.1475
+      }
+    }
+  },
+  "position_bias_swap_check": {
+    "mean_absolute_swap_diff": 0.0,
+    "p_a_to_p_b_diff": 0.0,
+    "p_b_to_p_a_diff": 0.0,
+    "p_tie_invariance_diff": 0.0
+  },
+  "model_drive_link": "https://drive.google.com/drive/folders/cc3084_deberta_javier_checkpoints"
+}
